@@ -4,27 +4,27 @@ import java.io.IOException;
 
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 
 public class FirstView extends HBox {
 
 	private EarthView earthView;
 	private PlayView playView;
 	
+	private ResearchView researchView;
+	private LegendView legendView;
+	
 	public FirstView() {
 		earthView = new EarthView();
 		
 		playView = new PlayView();
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("PlayView.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PlayView.fxml"));
 		loader.setController(playView);
-		
 		Parent play = null;
 		try {
 			play = loader.load();
@@ -35,14 +35,34 @@ public class FirstView extends HBox {
 		VBox leftPane = new VBox();
 		leftPane.getChildren().addAll(earthView, play);
 		
+		researchView = new ResearchView();
+		loader = new FXMLLoader(getClass().getResource("/fxml/ResearchView.fxml"));
+		loader.setController(researchView);
+		Parent research = null;
+		try {
+			research = loader.load();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		legendView = new LegendView();
+		loader = new FXMLLoader(getClass().getResource("/fxml/LegendView.fxml"));
+		loader.setController(legendView);
+		Parent legend = null;
+		try {
+			legend = loader.load();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		Separator s = new Separator();
+		s.setOrientation(Orientation.HORIZONTAL);
+		s.setPadding(new Insets(30, 0, 30, 0));
 		VBox rightPane = new VBox();
+		rightPane.getChildren().addAll(research, s, legend);
 		
-//		Color color = Color.BLACK;
-//		Background b = new Background(new BackgroundFill(color, new CornerRadii(0), new Insets(0)));
-//		earthView.setBackground(b);
-//		earthView.setMinHeight(400);
-//		earthView.setMinWidth(400);
-		
+		this.setPadding(new Insets(5, 5, 5, 5));
+		this.setAlignment(Pos.CENTER);
 		this.getChildren().addAll(leftPane, rightPane);
 	}
 }
