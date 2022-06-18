@@ -1,5 +1,7 @@
 package controller;
 
+import java.util.List;
+
 import event.GeoHashListener;
 import event.SpecieNameListener;
 import model.Model;
@@ -14,62 +16,57 @@ public class Controller implements ControllerInterface {
 	
 	@Override
 	public Specie getSpecie() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.model.getSpecie();
 	}
 
 	@Override
 	public void setSpecie(String specieName) {
-		// TODO Auto-generated method stub
-		
+		this.model.setSpecie(specieName);
 	}
 
 	@Override
 	public String getGeoHash() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.model.getGeoHash();
 	}
 
 	@Override
 	public void setGeoHash(String geoHash) {
-		// TODO Auto-generated method stub
-		
+		this.model.setGeoHash(geoHash);
 	}
 
 	@Override
 	public void addSpecieNameListener(SpecieNameListener specieNameListener) {
-		// TODO Auto-generated method stub
-		
+		this.model.addSpecieNameListener(specieNameListener);
 	}
 
 	@Override
 	public void removeSpecieNameListener(SpecieNameListener specieNameListener) {
-		// TODO Auto-generated method stub
-		
+		this.model.removeSpecieNameListener(specieNameListener);
 	}
 
 	@Override
 	public void addGeoHashListener(GeoHashListener geoHashListener) {
-		// TODO Auto-generated method stub
-		
+		this.model.addGeoHashListener(geoHashListener);
 	}
 
 	@Override
 	public void removeGeoHashListener(GeoHashListener geoHashListener) {
-		// TODO Auto-generated method stub
-		
+		this.model.removeGeoHashListener(geoHashListener);
+	}
+	
+	@Override
+	public List<String> getListSuggestions(String text) {
+		return this.model.getListSuggestions(text);
 	}
 
 	@Override
 	public void notifySpecieNameChanged(String specieName) {
-		// TODO Auto-generated method stub
-		
+		this.model.setSpecie(specieName);
 	}
 
 	@Override
 	public void notifyGeoHashChanged(String geoHash) {
-		// TODO Auto-generated method stub
-		
+		this.model.setGeoHash(geoHash);
 	}
 
 }

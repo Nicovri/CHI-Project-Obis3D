@@ -4,6 +4,9 @@ import java.net.URL;
 
 import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
 
+import controller.Controller;
+import event.SpecieNameChangedEvent;
+import event.SpecieNameListener;
 import javafx.scene.AmbientLight;
 import javafx.scene.Camera;
 import javafx.scene.Group;
@@ -17,11 +20,18 @@ import javafx.scene.shape.MeshView;
 import utils.CameraManager;
 
 public class EarthView extends Pane {
+	private Controller controller;
+	
 	private Group root3D;
 	
-	public EarthView() {
-		root3D = new Group();
+	public EarthView(Controller controller) {
+		this.controller = controller;
 		
+		root3D = new Group();
+		this.initializeEarthModel();
+	}
+	
+	private void initializeEarthModel() {
         ObjModelImporter objImporter = new ObjModelImporter();
         URL modelUrl = this.getClass().getResource("/res/earth.obj");
         objImporter.read(modelUrl);

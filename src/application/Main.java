@@ -1,19 +1,27 @@
 package application;
 
+import controller.Controller;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.stage.Stage;
+import model.Model;
 import view.FirstView;
 import javafx.scene.Scene;
 
 
 public class Main extends Application {
+	private Controller controller;
+	private Model model;
+	
 	private FirstView firstView;
 	
 	@Override
 	public void start(Stage primaryStage) {
-		firstView = new FirstView();
+		model = new Model();
+		controller = new Controller(model);
+		
+		firstView = new FirstView(controller);
 		
 		try {
 			Scene scene = new Scene(firstView);
@@ -24,7 +32,7 @@ public class Main extends Application {
 			final double START_HEIGHT = 690; //firstView.getHeight();
 			primaryStage.setMinWidth(START_WIDTH);
 			primaryStage.setMinHeight(START_HEIGHT);
-			
+
 			// Plutôt changer la taille des sous-vues à la place
 			// Get largeur des vues de firstView, de Window, faire la différence et ajouter un spacing
 			

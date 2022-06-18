@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 import event.GeoHashListener;
 import event.SpecieNameListener;
 import model.animal.Specie;
@@ -21,6 +23,12 @@ public interface ModelInterface {
 	public void addGeoHashListener(GeoHashListener geoHashListener);
 	
 	public void removeGeoHashListener(GeoHashListener geoHashListener);
+	
+	public List<String> getListSuggestions(String text);
+	
+	public boolean updateOccurrences();
+	
+	public boolean updateIndividuals();
 	
 	public void fireSpecieNameChanged();
 	

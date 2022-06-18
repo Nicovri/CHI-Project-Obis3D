@@ -2,6 +2,7 @@ package view;
 
 import java.io.IOException;
 
+import controller.Controller;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -12,15 +13,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class FirstView extends HBox {
-
+	private Controller controller;
+	
 	private EarthView earthView;
 	private PlayView playView;
 	
 	private ResearchView researchView;
 	private LegendView legendView;
 	
-	public FirstView() {
-		earthView = new EarthView();
+	public FirstView(Controller controller) {
+		this.controller = controller;
+		
+		earthView = new EarthView(controller);
 		
 		playView = new PlayView();
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PlayView.fxml"));
@@ -35,7 +39,7 @@ public class FirstView extends HBox {
 		VBox leftPane = new VBox();
 		leftPane.getChildren().addAll(earthView, play);
 		
-		researchView = new ResearchView();
+		researchView = new ResearchView(controller);
 		loader = new FXMLLoader(getClass().getResource("/fxml/ResearchView.fxml"));
 		loader.setController(researchView);
 		Parent research = null;
@@ -60,7 +64,7 @@ public class FirstView extends HBox {
 		s.setPadding(new Insets(30, 0, 30, 0));
 		VBox rightPane = new VBox();
 		rightPane.getChildren().addAll(research, s, legend);
-		
+				
 		this.setPadding(new Insets(5, 5, 5, 5));
 		this.setAlignment(Pos.CENTER);
 		this.getChildren().addAll(leftPane, rightPane);

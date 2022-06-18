@@ -1,5 +1,7 @@
 package controller;
 
+import java.util.List;
+
 import event.GeoHashListener;
 import event.SpecieNameListener;
 import model.animal.Specie;
@@ -21,6 +23,8 @@ public interface ControllerInterface {
 	public void addGeoHashListener(GeoHashListener geoHashListener);
 	
 	public void removeGeoHashListener(GeoHashListener geoHashListener);
+	
+	public List<String> getListSuggestions(String text);
 	
 	public void notifySpecieNameChanged(String specieName);
 	

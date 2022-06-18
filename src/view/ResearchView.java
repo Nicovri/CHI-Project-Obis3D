@@ -5,20 +5,31 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
+import controller.Controller;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 
 public class ResearchView implements Initializable {
+	private Controller controller;
+	
+	private Font fontBold;
+	private Font fontRegular;
 
+	@FXML
+	private Button searchButton;
+	
 	@FXML
 	private TextField searchBar;
 	
 	@FXML
-	private ListView suggestions;
+	private ListView<String> suggestions;
 	
 	@FXML
 	private DatePicker startDate;
@@ -32,8 +43,8 @@ public class ResearchView implements Initializable {
 	@FXML
 	private Button mode3DButton;
 	
-	public ResearchView() {
-		
+	public ResearchView(Controller controller) {
+		this.controller = controller;
 	}
 
 	@Override
@@ -42,5 +53,37 @@ public class ResearchView implements Initializable {
 		LocalDate localDate = LocalDate.parse("01-01-1027", formatter);
 		startDate.setValue(localDate);
 		endDate.setValue(LocalDate.now());
+		
+		searchBar.setText("Selachii");
+		
+		suggestions.setVisible(false);
+		
+		fontRegular = mode2DButton.getFont();
+		fontBold = Font.font(fontRegular.getName(), FontWeight.BOLD, FontPosture.REGULAR, fontRegular.getSize());
+		mode2DButton.setFont(fontBold);
+		
+		mode2DButton.setOnMouseClicked(event -> {
+			mode2DButton.setFont(fontBold);
+			mode3DButton.setFont(fontRegular);
+		});
+		mode3DButton.setOnMouseClicked(event -> {
+			mode2DButton.setFont(fontRegular);
+			mode3DButton.setFont(fontBold);
+		});
+		
+//		searchBar.focusedProperty().addListener(event -> {
+//			if(searchBar.isFocused()) {				
+//				List<String> list = controller.getListSuggestions("Selachii");
+//				for(String s : list) {				
+//					suggestions.getItems().add(s);
+//				}
+//				suggestions.setVisible(true);
+//			} else {
+//				for(String s : suggestions.getItems()) {					
+//					suggestions.getItems().remove(s);
+//				}
+//				suggestions.setVisible(false);
+//			}
+//		});
 	}
 }
