@@ -8,9 +8,9 @@ import model.animal.Specie;
 
 public interface ControllerInterface {
 	
-	public Specie getSpecie();
+	public String getSpecieName();
 	
-	public void setSpecie(String specieName);
+	public void setSpecieName(String specieName);
 	
 	public String getGeoHash();
 	

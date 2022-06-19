@@ -13,7 +13,7 @@ import model.animal.Specie;
 import utils.JSON;
 
 public class Model implements ModelInterface {
-	private Specie currentSpecie;
+	private String currentSpecieName;
 	private Map<String, Long> occurrences;
 	
 	private String currentGeoHash;
@@ -30,15 +30,20 @@ public class Model implements ModelInterface {
 		geoHashListeners = new ArrayList<>();
 	}
 	
+	public void initModel(String specieName) {
+		this.currentSpecieName = specieName;
+		this.fireSpecieNameChanged(true);
+	}
+	
 	@Override
-	public Specie getSpecie() {
-		return this.currentSpecie;
+	public String getSpecieName() {
+		return this.currentSpecieName;
 	}
 
 	@Override
-	public void setSpecie(String specieName) {
-		// TODO
-//		this.fireSpecieNameChanged();
+	public void setSpecieName(String specieName) {
+		this.currentSpecieName = specieName;
+		this.fireSpecieNameChanged(false);
 	}
 
 	@Override
@@ -82,10 +87,15 @@ public class Model implements ModelInterface {
 	}
 	
 	@Override
-	public boolean updateOccurrences() {
-		this.occurrences = JSON.fetchResultSpecieOccurences(JSON.getFromRequest("https://api.obis.org/v3/occurrence/grid/3?scientificname=" + currentSpecie.getScientificName()));
+	public boolean updateOccurrences(boolean isInit) {
+		if(isInit) {
+			this.occurrences = JSON.fetchResultSpecieOccurences(JSON.getFromFile("/res/" + currentSpecieName + ".json"));
+			return true;
+		} else {			
+			this.occurrences = JSON.fetchResultSpecieOccurences(JSON.getFromRequest("https://api.obis.org/v3/occurrence/grid/3?scientificname=" + currentSpecieName));
+			return true;
+		}
 		// If something went wrong return false?
-		return true;
 	}
 	
 	@Override
@@ -95,12 +105,14 @@ public class Model implements ModelInterface {
 	}
 	
 	@Override
-	public void fireSpecieNameChanged() {
-		if(this.updateOccurrences()) {			
+	public void fireSpecieNameChanged(boolean isInit) {
+		if(this.updateOccurrences(isInit)) {			
 			for(SpecieNameListener s : specieNameListeners) {
-//				s.specieNameChanged(new SpecieNameChangedEvent(this, currentSpecie.getScientificName()));
+				s.specieNameChanged(new SpecieNameChangedEvent(this, currentSpecieName, occurrences));
 			}
-		}
+		}/* else {
+			this.setSpecie(this.currentSpecie.getScientificName());
+		}*/
 	}
 
 	@Override

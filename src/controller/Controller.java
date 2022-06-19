@@ -15,13 +15,13 @@ public class Controller implements ControllerInterface {
 	}
 	
 	@Override
-	public Specie getSpecie() {
-		return this.model.getSpecie();
+	public String getSpecieName() {
+		return this.model.getSpecieName();
 	}
 
 	@Override
-	public void setSpecie(String specieName) {
-		this.model.setSpecie(specieName);
+	public void setSpecieName(String specieName) {
+		this.model.setSpecieName(specieName);
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class Controller implements ControllerInterface {
 
 	@Override
 	public void notifySpecieNameChanged(String specieName) {
-		this.model.setSpecie(specieName);
+		this.model.setSpecieName(specieName);
 	}
 
 	@Override

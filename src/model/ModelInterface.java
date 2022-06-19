@@ -8,9 +8,9 @@ import model.animal.Specie;
 
 public interface ModelInterface {
 	
-	public Specie getSpecie();
+	public String getSpecieName();
 	
-	public void setSpecie(String specieName);
+	public void setSpecieName(String specieName);
 	
 	public String getGeoHash();
 	
@@ -26,11 +26,11 @@ public interface ModelInterface {
 	
 	public List<String> getListSuggestions(String text);
 	
-	public boolean updateOccurrences();
+	public boolean updateOccurrences(boolean isInit);
 	
 	public boolean updateIndividuals();
 	
-	public void fireSpecieNameChanged();
+	public void fireSpecieNameChanged(boolean isInit);
 	
 	public void fireGeoHashChanged();
 }

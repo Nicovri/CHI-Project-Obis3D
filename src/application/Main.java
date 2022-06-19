@@ -23,6 +23,8 @@ public class Main extends Application {
 		
 		firstView = new FirstView(controller);
 		
+		model.initModel("Selachii");
+		
 		try {
 			Scene scene = new Scene(firstView);
 			primaryStage.setTitle("Obis3D");

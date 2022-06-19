@@ -3,9 +3,12 @@ package view;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import controller.Controller;
+import event.SpecieNameChangedEvent;
+import event.SpecieNameListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -16,7 +19,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 
-public class ResearchView implements Initializable {
+public class ResearchView implements Initializable, ViewSpecieInterface, SpecieNameListener {
 	private Controller controller;
 	
 	private Font fontBold;
@@ -54,8 +57,6 @@ public class ResearchView implements Initializable {
 		startDate.setValue(localDate);
 		endDate.setValue(LocalDate.now());
 		
-		searchBar.setText("Selachii");
-		
 		suggestions.setVisible(false);
 		
 		fontRegular = mode2DButton.getFont();
@@ -85,5 +86,15 @@ public class ResearchView implements Initializable {
 //				suggestions.setVisible(false);
 //			}
 //		});
+	}
+
+	@Override
+	public void update(String specieName, Map<String, Long> occurrences, Long maxOcc) {
+		this.searchBar.setText(specieName);
+	}
+
+	@Override
+	public void specieNameChanged(SpecieNameChangedEvent event) {
+		this.update(event.getSpecieName(), event.getGeoHashAndNumberOfOccurrences(), event.getMaxOccurrences());
 	}
 }

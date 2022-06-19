@@ -103,11 +103,15 @@ public class JSON {
 				c = new Pair<>(new BigDecimal(temp_coord.getJSONArray(2).get(0).toString()), new BigDecimal(temp_coord.getJSONArray(2).get(1).toString()));
 				milieu = new Pair<>((a.getKey().add(c.getKey())).divide(new BigDecimal("2.0")), (a.getValue().add(c.getValue())).divide(new BigDecimal("2.0")));
 				Long nb = new Long(pos.getJSONObject("properties").getInt("n"));
+				// Précision à modifier en fonction du nombre entré (occurrence/grid/n? précision de n) (géohash spd précision 3, géohash spdef précision 5)
+				// Ou mettre 3 tout le temps (pour correspondre à grid/3 de la fonction buildGeoHashRequest)
+				// On en a besoin pour connaitre la taille du rectangle à dessiner sur la Terre
 				nbOccurences.put(GeoHashHelper.getGeohash(new Location("", milieu.getKey().doubleValue(), milieu.getValue().doubleValue()), 5), nb);
 			});
 		});
 		return nbOccurences;
 	}
+	
 	public static void main(String[] args)
 	{
 		HashMap<String, Long> nbOccurences = fetchResultSpecieOccurences(getFromFile("/res/Selachii.json"));
@@ -115,6 +119,9 @@ public class JSON {
 		{
 			System.out.println(i);
 		}*/
+		for(String s : nbOccurences.keySet()) {
+			System.out.println(s);
+		}
 		System.out.println(buildGeoHashRequest("spd", "Manta birostris"));
 
 	}

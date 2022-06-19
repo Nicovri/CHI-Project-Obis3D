@@ -23,4 +23,12 @@ public class SpecieNameChangedEvent extends Event {
 	public String getSpecieName() { return this.specieName; }
 	
 	public Map<String, Long> getGeoHashAndNumberOfOccurrences() { return this.data; }
+	
+	public Long getMaxOccurrences() {
+		long max = 0;
+		for(Long l : data.values()) {
+			max += l.longValue();
+		}
+		return Long.valueOf(max);
+	}
 }

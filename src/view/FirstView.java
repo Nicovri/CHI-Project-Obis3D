@@ -24,7 +24,7 @@ public class FirstView extends HBox {
 	public FirstView(Controller controller) {
 		this.controller = controller;
 		
-		earthView = new EarthView(controller);
+		earthView = new EarthView(this.controller);
 		
 		playView = new PlayView();
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PlayView.fxml"));
@@ -39,7 +39,7 @@ public class FirstView extends HBox {
 		VBox leftPane = new VBox();
 		leftPane.getChildren().addAll(earthView, play);
 		
-		researchView = new ResearchView(controller);
+		researchView = new ResearchView(this.controller);
 		loader = new FXMLLoader(getClass().getResource("/fxml/ResearchView.fxml"));
 		loader.setController(researchView);
 		Parent research = null;
@@ -49,7 +49,7 @@ public class FirstView extends HBox {
 			e.printStackTrace();
 		}
 		
-		legendView = new LegendView();
+		legendView = new LegendView(this.controller);
 		loader = new FXMLLoader(getClass().getResource("/fxml/LegendView.fxml"));
 		loader.setController(legendView);
 		Parent legend = null;
@@ -68,5 +68,11 @@ public class FirstView extends HBox {
 		this.setPadding(new Insets(5, 5, 5, 5));
 		this.setAlignment(Pos.CENTER);
 		this.getChildren().addAll(leftPane, rightPane);
+		
+		this.controller.addSpecieNameListener(earthView);
+//		this.controller.addSpecieNameListener(playView);
+		this.controller.addSpecieNameListener(researchView);
+		this.controller.addSpecieNameListener(legendView);
+//		this.controller.addGeoHashListener(earthView);
 	}
 }
