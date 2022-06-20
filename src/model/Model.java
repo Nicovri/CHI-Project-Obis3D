@@ -1,5 +1,6 @@
 package model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +15,8 @@ import utils.JSON;
 
 public class Model implements ModelInterface {
 	private String currentSpecieName;
+	private String startdate;
+	private String enddate;
 	private Map<String, Long> occurrences;
 	
 	private String currentGeoHash;
@@ -32,6 +35,15 @@ public class Model implements ModelInterface {
 	
 	public void initModel(String specieName) {
 		this.currentSpecieName = specieName;
+		this.startdate = "1027-01-01";
+		this.enddate = LocalDate.now().toString();
+		this.fireSpecieNameChanged(true);
+	}
+	
+	public void initModelWithDates(String specieName, String startdate, String enddate) {
+		this.currentSpecieName = specieName;
+		this.startdate = startdate;
+		this.enddate = enddate;
 		this.fireSpecieNameChanged(true);
 	}
 	
@@ -44,6 +56,16 @@ public class Model implements ModelInterface {
 	public void setSpecieName(String specieName) {
 		this.currentSpecieName = specieName;
 		this.fireSpecieNameChanged(false);
+	}
+	
+	@Override
+	public void setStartDate(String startdate) {
+		this.startdate = startdate;
+	}
+	
+	@Override
+	public void setEndDate(String enddate) {
+		this.enddate = enddate;
 	}
 
 	@Override
@@ -92,7 +114,7 @@ public class Model implements ModelInterface {
 			this.occurrences = JSON.fetchResultSpecieOccurences(JSON.getFromFile("/res/" + currentSpecieName + ".json"));
 			return true;
 		} else {			
-			this.occurrences = JSON.fetchResultSpecieOccurences(JSON.getFromRequest("https://api.obis.org/v3/occurrence/grid/3?scientificname=" + currentSpecieName));
+			this.occurrences = JSON.fetchResultSpecieOccurences(JSON.getFromRequest(JSON.buildSpecieRequestWithGrid(currentSpecieName, startdate, enddate, 3)));
 			return true;
 		}
 		// If something went wrong return false?

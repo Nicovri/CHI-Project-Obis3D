@@ -28,5 +28,7 @@ public interface ControllerInterface {
 	
 	public void notifySpecieNameChanged(String specieName);
 	
+	public void notifySpecieNameAndDateChanged(String specieName, String startdate, String enddate);
+	
 	public void notifyGeoHashChanged(String geoHash);
 }

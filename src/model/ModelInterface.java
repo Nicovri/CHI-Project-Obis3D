@@ -10,7 +10,14 @@ public interface ModelInterface {
 	
 	public String getSpecieName();
 	
+	//public String getStartDate();
+	//public String getEndDate();
+	
 	public void setSpecieName(String specieName);
+	
+	public void setStartDate(String startDate);
+	
+	public void setEndDate(String enddate);
 	
 	public String getGeoHash();
 	

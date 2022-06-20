@@ -20,6 +20,7 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 import utils.ColorLegend8;
 
 public class LegendView implements Initializable, ViewSpecieInterface, SpecieNameListener {
@@ -95,16 +96,18 @@ public class LegendView implements Initializable, ViewSpecieInterface, SpecieNam
 	}
 
 	@Override
-	public void update(String specieName, Map<String, Long> occurrences, Long maxOcc) {
-		Double scale = maxOcc.longValue() / 8.0;
-		label1.setText("From " + ((Double)(scale*0)).longValue() + " to " + ((Double)(scale*1)).longValue());
-		label2.setText("From " + ((Double)(scale*1)).longValue() + " to " + ((Double)(scale*2)).longValue());
-		label3.setText("From " + ((Double)(scale*2)).longValue() + " to " + ((Double)(scale*3)).longValue());
-		label4.setText("From " + ((Double)(scale*3)).longValue() + " to " + ((Double)(scale*4)).longValue());
-		label5.setText("From " + ((Double)(scale*4)).longValue() + " to " + ((Double)(scale*5)).longValue());
-		label6.setText("From " + ((Double)(scale*5)).longValue() + " to " + ((Double)(scale*6)).longValue());
-		label7.setText("From " + ((Double)(scale*6)).longValue() + " to " + ((Double)(scale*7)).longValue());
-		label8.setText("From " + ((Double)(scale*7)).longValue() + " to " + ((Double)(scale*8)).longValue());
+	public void update(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc) {
+		if(maxMinOcc.getKey() > 0) {			
+			Double scale = (maxMinOcc.getKey().longValue() - maxMinOcc.getValue().longValue()) / 8.0;
+			label1.setText("From " + maxMinOcc.getValue().longValue() + " to " + Math.round(scale*1));
+			label2.setText("From " + Math.round(scale*1) + " to " + Math.round(scale*2));
+			label3.setText("From " + Math.round(scale*2) + " to " + Math.round(scale*3));
+			label4.setText("From " + Math.round(scale*3) + " to " + Math.round(scale*4));
+			label5.setText("From " + Math.round(scale*4) + " to " + Math.round(scale*5));
+			label6.setText("From " + Math.round(scale*5) + " to " + Math.round(scale*6));
+			label7.setText("From " + Math.round(scale*6) + " to " + Math.round(scale*7));
+			label8.setText("From " + Math.round(scale*7) + " to " + maxMinOcc.getKey());
+		}
 	}
 
 	@Override

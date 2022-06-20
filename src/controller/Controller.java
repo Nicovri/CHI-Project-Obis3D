@@ -63,6 +63,13 @@ public class Controller implements ControllerInterface {
 	public void notifySpecieNameChanged(String specieName) {
 		this.model.setSpecieName(specieName);
 	}
+	
+	@Override
+	public void notifySpecieNameAndDateChanged(String specieName, String startdate, String enddate) {
+		this.model.setStartDate(startdate);
+		this.model.setEndDate(enddate);
+		this.model.setSpecieName(specieName);
+	}
 
 	@Override
 	public void notifyGeoHashChanged(String geoHash) {

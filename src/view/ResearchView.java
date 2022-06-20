@@ -11,16 +11,24 @@ import event.SpecieNameChangedEvent;
 import event.SpecieNameListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
+import javafx.util.Pair;
 
 public class ResearchView implements Initializable, ViewSpecieInterface, SpecieNameListener {
 	private Controller controller;
+	
+	private String correctSpecieName;
 	
 	private Font fontBold;
 	private Font fontRegular;
@@ -57,6 +65,10 @@ public class ResearchView implements Initializable, ViewSpecieInterface, SpecieN
 		startDate.setValue(localDate);
 		endDate.setValue(LocalDate.now());
 		
+		startDate.setOnAction(event -> {
+			controller.notifySpecieNameAndDateChanged(searchBar.getText(), startDate.getValue().toString(), endDate.getValue().toString());
+		});
+		
 		suggestions.setVisible(false);
 		
 		fontRegular = mode2DButton.getFont();
@@ -86,11 +98,28 @@ public class ResearchView implements Initializable, ViewSpecieInterface, SpecieN
 //				suggestions.setVisible(false);
 //			}
 //		});
+		
+		searchBar.setOnKeyPressed(event -> {
+			if(event.getCode() == KeyCode.ENTER) {
+				controller.notifySpecieNameChanged(searchBar.getText());
+			}
+		});
+		
+		searchButton.setOnMouseClicked(event -> {
+			controller.notifySpecieNameChanged(searchBar.getText());
+		});
 	}
 
 	@Override
-	public void update(String specieName, Map<String, Long> occurrences, Long maxOcc) {
-		this.searchBar.setText(specieName);
+	public void update(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc) {
+		if(maxMinOcc.getKey() > 0) {
+			this.correctSpecieName = specieName;
+			this.searchBar.setText(correctSpecieName);
+		} else {
+			Alert error = new Alert(AlertType.ERROR, "The specie's scientific name is not in the database...", ButtonType.OK);
+			error.show();
+			this.searchBar.setText(correctSpecieName);
+		}
 	}
 
 	@Override

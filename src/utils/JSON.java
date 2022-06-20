@@ -19,12 +19,12 @@ import java.net.http.HttpResponse.BodyHandler;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import javafx.util.Pair;
@@ -48,7 +48,9 @@ public class JSON {
 	{
 		try
 		{
-			Reader reader = new FileReader(path);
+//			Reader reader = new FileReader(path);
+			InputStream input = JSON.class.getResourceAsStream(path);
+			Reader reader = new InputStreamReader(input);
 			BufferedReader rd = new BufferedReader(reader);
 			String jsonText = readAll(rd);
 			JSONObject jsonRoot = new JSONObject(jsonText);
@@ -109,20 +111,27 @@ public class JSON {
 		return sb.toString();
 	}
 	
-	public static String buildSpecieRequestWithGrid(String specieName, String grid)
+	public static String buildSpecieRequestWithGrid(String specieName, int grid)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("https://api.obis.org/v3/occurrence/grid/"+grid);
-		sb.append("?scientificname=" + specieName);
+		if(!specieName.equals(""))
+		{
+			specieName = specieName.replace(" ", "%20");
+			sb.append("?scientificname=" + specieName);
+		}
 		return sb.toString();
 	}
 
 	//https://api.obis.org/v3/occurrence?scientificname=Delphinidae&startdate=2000-01-01&enddate=2010-12-31
-	public static String buildSpecieRequestWithGrid(String specieName, String startDate, String endDate, String grid)
+	public static String buildSpecieRequestWithGrid(String specieName, String startDate, String endDate, int grid)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("https://api.obis.org/v3/occurrence/grid/"+grid);
-		sb.append("?scientificname=" + specieName);
+		if(!specieName.equals("")) {
+			specieName.replace(" ", "%20");
+			sb.append("?scientificname=" + specieName);
+		}
 		sb.append("&startdate="+startDate);
 		sb.append("&enddate="+endDate);		
 		return sb.toString();
@@ -132,28 +141,33 @@ public class JSON {
 	{
 		HashMap<String, Long> nbOccurences = new HashMap<>(); //String = geohash d'une pos
 
-
-		JSONArray resultat = rawResult.getJSONArray("features");
-		resultat.forEach(item -> {
-
-			JSONObject pos = (JSONObject) item;
-			JSONObject coord = pos.getJSONObject("geometry");
-			JSONArray temp = coord.getJSONArray("coordinates");
-			temp.forEach(carre -> {
-
-				Pair<BigDecimal, BigDecimal> a, c, milieu; //On veut calculer le centre du carré géo, qui vaut le milieu du segment AC
-				JSONArray temp_coord = (JSONArray) carre;
-				a = new Pair<>(new BigDecimal(temp_coord.getJSONArray(0).get(0).toString()), new BigDecimal(temp_coord.getJSONArray(0).get(1).toString()));
-				c = new Pair<>(new BigDecimal(temp_coord.getJSONArray(2).get(0).toString()), new BigDecimal(temp_coord.getJSONArray(2).get(1).toString()));
-				milieu = new Pair<>((a.getKey().add(c.getKey())).divide(new BigDecimal("2.0")), (a.getValue().add(c.getValue())).divide(new BigDecimal("2.0")));
-				Long nb = pos.getJSONObject("properties").getLong("n");
-				// Precision a modifier en fonction du nombre entre(occurrence/grid/n? precision de n) (geohash spd precision 3, geohash spdef precision 5)
-				// Ou mettre 3 tout le temps (pour correspondre � grid/3 de la fonction buildGeoHashRequest)
-				// On en a besoin pour connaitre la taille du rectangle a dessiner sur la Terre
-				nbOccurences.put(GeoHashHelper.getGeohash(new Location("", milieu.getKey().doubleValue(), milieu.getValue().doubleValue()), 5), nb);
+		try {
+			
+			JSONArray resultat = rawResult.getJSONArray("features");
+			resultat.forEach(item -> {
+				
+				JSONObject pos = (JSONObject) item;
+				JSONObject coord = pos.getJSONObject("geometry");
+				JSONArray temp = coord.getJSONArray("coordinates");
+				temp.forEach(carre -> {
+					
+					Pair<BigDecimal, BigDecimal> a, c, milieu; //On veut calculer le centre du carré géo, qui vaut le milieu du segment AC
+					JSONArray temp_coord = (JSONArray) carre;
+					a = new Pair<>(new BigDecimal(temp_coord.getJSONArray(0).get(0).toString()), new BigDecimal(temp_coord.getJSONArray(0).get(1).toString()));
+					c = new Pair<>(new BigDecimal(temp_coord.getJSONArray(2).get(0).toString()), new BigDecimal(temp_coord.getJSONArray(2).get(1).toString()));
+					milieu = new Pair<>((a.getKey().add(c.getKey())).divide(new BigDecimal("2.0")), (a.getValue().add(c.getValue())).divide(new BigDecimal("2.0")));
+					Long nb = pos.getJSONObject("properties").getLong("n");
+					// Precision a modifier en fonction du nombre entre(occurrence/grid/n? precision de n) (geohash spd precision 3, geohash spdef precision 5)
+					// Ou mettre 3 tout le temps (pour correspondre � grid/3 de la fonction buildGeoHashRequest)
+					// On en a besoin pour connaitre la taille du rectangle a dessiner sur la Terre
+					nbOccurences.put(GeoHashHelper.getGeohash(new Location("", milieu.getKey().doubleValue(), milieu.getValue().doubleValue()), 3), nb);
+				});
 			});
-		});
-		return nbOccurences;
+			return nbOccurences;
+			
+		} catch(JSONException e) {
+			return nbOccurences;
+		}
 	}
 	
 	public static void main(String[] args)

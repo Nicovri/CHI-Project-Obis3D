@@ -6,6 +6,7 @@ module Obis3D {
 	requires javafx.base;
 	requires org.json;
 	requires junit;
+	requires java.net.http;
 	
 	opens application to javafx.graphics, javafx.fxml;
 	opens view to javafx.fxml;

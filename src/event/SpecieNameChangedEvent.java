@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javafx.event.Event;
 import javafx.event.EventType;
+import javafx.util.Pair;
 
 public class SpecieNameChangedEvent extends Event {
 	public static String TYPE = "VALUE_CHANGED";
@@ -24,11 +25,22 @@ public class SpecieNameChangedEvent extends Event {
 	
 	public Map<String, Long> getGeoHashAndNumberOfOccurrences() { return this.data; }
 	
-	public Long getMaxOccurrences() {
+	public Pair<Long, Long> getMaxOccurrences() {
 		long max = 0;
-		for(Long l : data.values()) {
-			max += l.longValue();
+		long min = 0;
+		if(data.isEmpty()) {
+			return new Pair<Long, Long>(max, min);
 		}
-		return Long.valueOf(max);
+		// Iterables.get(collection, 0)
+		min = ((Long)data.values().toArray()[0]).longValue();
+		for(Long l : data.values()) {
+			if(l.longValue() > max) {
+				max = l.longValue();
+			}
+			if(l.longValue() < min) {
+				min = l.longValue();
+			}
+		}
+		return new Pair<Long, Long>(Long.valueOf(max), Long.valueOf(min));
 	}
 }
