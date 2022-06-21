@@ -9,24 +9,20 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandler;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-
 import javafx.util.Pair;
 import model.geohash.GeoHashHelper;
 import model.geohash.Location;
@@ -44,17 +40,33 @@ public class JSON {
 		return sb.toString();
 	}
 
-	public static JSONObject getFromFile(String path)
+	//On retourne une liste car la recherche verbose retourne directement un array
+	//solution : enlever l'array et retourner la liste d'objets a l'interieur
+	public static List<JSONObject> getFromFile(String path)
 	{
 		try
 		{
-//			Reader reader = new FileReader(path);
 			InputStream input = JSON.class.getResourceAsStream(path);
 			Reader reader = new InputStreamReader(input);
 			BufferedReader rd = new BufferedReader(reader);
 			String jsonText = readAll(rd);
-			JSONObject jsonRoot = new JSONObject(jsonText);
-			return jsonRoot;
+			ArrayList<JSONObject> listJson = new ArrayList<JSONObject>();
+			if(jsonText.charAt(0)=='{')
+			{
+				JSONObject jsonRoot = new JSONObject(jsonText);
+				listJson.add(jsonRoot);
+				return listJson;
+			}
+			else
+			{
+				JSONArray jsonArray = new JSONArray(jsonText);
+				jsonArray.forEach(item ->
+				{
+					JSONObject objet = (JSONObject) item;
+					listJson.add(objet);
+				});
+				return listJson;
+			}
 		}
 		catch(IOException e)
 		{
@@ -63,9 +75,9 @@ public class JSON {
 		}
 	}
 
-	public static JSONObject getFromRequest(String requestUrl)
+	public static List<JSONObject> getFromRequest(String requestUrl)
 	{
-		String json ="";
+		String jsonText ="";
 		HttpClient client = HttpClient.newBuilder()
 				.version(Version.HTTP_1_1)
 				.followRedirects(Redirect.NORMAL)
@@ -79,13 +91,29 @@ public class JSON {
 		        .build();
 		try
 		{
-			json = client.sendAsync(request, BodyHandlers.ofString())
+			jsonText = client.sendAsync(request, BodyHandlers.ofString())
 					.thenApply(HttpResponse::body).get(10, TimeUnit.SECONDS);
 		}catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-		return new JSONObject(json);
+		ArrayList<JSONObject> listJson = new ArrayList<JSONObject>();
+		if(jsonText.charAt(0)=='{')
+		{
+			JSONObject jsonRoot = new JSONObject(jsonText);
+			listJson.add(jsonRoot);
+			return listJson;
+		}
+		else
+		{
+			JSONArray jsonArray = new JSONArray(jsonText);
+			jsonArray.forEach(item ->
+			{
+				JSONObject objet = (JSONObject) item;
+				listJson.add(objet);
+			});
+			return listJson;
+		}
 	}
 
 	public static String buildGeoHashRequest(String geohash, String specieName)//String s = GeoHash plus tard
@@ -102,82 +130,101 @@ public class JSON {
 		return sb.toString();
 	}
 
-	// Return object Specie instead (for Model)?
 	public static String buildSpecieRequest(String specieName)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("https://api.obis.org/v3/occurrence");
+		specieName = specieName.replace(" ", "%20");
 		sb.append("?scientificname=" + specieName);
 		return sb.toString();
 	}
-	
+
 	public static String buildSpecieRequestWithGrid(String specieName, int grid)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("https://api.obis.org/v3/occurrence/grid/"+grid);
-		if(!specieName.equals(""))
-		{
-			specieName = specieName.replace(" ", "%20");
-			sb.append("?scientificname=" + specieName);
-		}
+		specieName = specieName.replace(" ", "%20");
+		sb.append("?scientificname=" + specieName);
 		return sb.toString();
 	}
 
-	//https://api.obis.org/v3/occurrence?scientificname=Delphinidae&startdate=2000-01-01&enddate=2010-12-31
 	public static String buildSpecieRequestWithGrid(String specieName, String startDate, String endDate, int grid)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("https://api.obis.org/v3/occurrence/grid/"+grid);
-		if(!specieName.equals("")) {
-			specieName.replace(" ", "%20");
-			sb.append("?scientificname=" + specieName);
-		}
+		specieName = specieName.replace(" ", "%20");
+		sb.append("?scientificname=" + specieName);
 		sb.append("&startdate="+startDate);
-		sb.append("&enddate="+endDate);		
+		sb.append("&enddate="+endDate);
 		return sb.toString();
 	}
 
-	public static HashMap<String, Long> fetchResultSpecieOccurences(JSONObject rawResult)
+	public static String buildRequestAutoIndent(String startName)
+	{
+		StringBuilder sb = new StringBuilder();
+		startName = startName.replace(" ", "%20");
+		sb.append("https://api.obis.org/v3/taxon/complete/verbose/"+startName);
+		return sb.toString();
+	}
+
+	public static List<String> fetchAutoIndent(List<JSONObject> rawResult)
+	{
+		List<String> listName = new ArrayList<String>();
+		for(JSONObject jo : rawResult)
+		{
+			listName.add(jo.getString("scientificName"));
+		}
+		return listName;
+	}
+
+	public static HashMap<String, Long> fetchResultSpecieOccurences(List<JSONObject> rawResult)
 	{
 		HashMap<String, Long> nbOccurences = new HashMap<>(); //String = geohash d'une pos
-
-		try {
-			
-			JSONArray resultat = rawResult.getJSONArray("features");
+		
+		//Normalement un seul jo (un seul tour de boucle) mais sait-on jamais
+		for(JSONObject jo : rawResult)
+		{
+			JSONArray resultat = jo.getJSONArray("features");
 			resultat.forEach(item -> {
-				
 				JSONObject pos = (JSONObject) item;
 				JSONObject coord = pos.getJSONObject("geometry");
 				JSONArray temp = coord.getJSONArray("coordinates");
 				temp.forEach(carre -> {
-					
+
 					Pair<BigDecimal, BigDecimal> a, c, milieu; //On veut calculer le centre du carré géo, qui vaut le milieu du segment AC
 					JSONArray temp_coord = (JSONArray) carre;
 					a = new Pair<>(new BigDecimal(temp_coord.getJSONArray(0).get(0).toString()), new BigDecimal(temp_coord.getJSONArray(0).get(1).toString()));
 					c = new Pair<>(new BigDecimal(temp_coord.getJSONArray(2).get(0).toString()), new BigDecimal(temp_coord.getJSONArray(2).get(1).toString()));
 					milieu = new Pair<>((a.getKey().add(c.getKey())).divide(new BigDecimal("2.0")), (a.getValue().add(c.getValue())).divide(new BigDecimal("2.0")));
+					System.out.println(milieu.getKey().doubleValue() +":"+milieu.getValue().doubleValue());
+					System.out.println(GeoHashHelper.getGeohash(new Location("", milieu.getKey().doubleValue(), milieu.getValue().doubleValue()), 3));
 					Long nb = pos.getJSONObject("properties").getLong("n");
 					// Precision a modifier en fonction du nombre entre(occurrence/grid/n? precision de n) (geohash spd precision 3, geohash spdef precision 5)
-					// Ou mettre 3 tout le temps (pour correspondre � grid/3 de la fonction buildGeoHashRequest)
+					// Ou mettre 3 tout le temps (pour correspondre a grid/3 de la fonction buildGeoHashRequest)
 					// On en a besoin pour connaitre la taille du rectangle a dessiner sur la Terre
 					nbOccurences.put(GeoHashHelper.getGeohash(new Location("", milieu.getKey().doubleValue(), milieu.getValue().doubleValue()), 3), nb);
 				});
 			});
-			return nbOccurences;
-			
-		} catch(JSONException e) {
-			return nbOccurences;
 		}
+		return nbOccurences;
 	}
-	
+
+
+
+	//Tests
 	public static void main(String[] args)
 	{
-		/*HashMap<String, Long> nbOccurences = fetchResultSpecieOccurences(getFromRequest(buildSpecieRequestWithGrid("Delphinidae", "3")));
-		for(Entry<String, Long> i : nbOccurences.entrySet())
+		//HashMap<String, Long> nbOccurences = fetchResultSpecieOccurences(getFromFile("Delphinidae.json"));
+		List<String> names = fetchAutoIndent(getFromFile("agab.json"));
+		for (String string : names) 
+		{
+			System.out.println(string);
+		}
+		/*for(Entry<String, Long> i : nbOccurences.entrySet())
 		{
 			System.out.println(i);
 		}*/
-		
+
 		/*for(String s : nbOccurences.keySet()) {
 			System.out.println(s);
 		}*/
