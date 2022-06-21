@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import javafx.util.Pair;
+import model.Individual;
+import model.Specie;
 import model.geohash.GeoHashHelper;
 import model.geohash.Location;
 
@@ -208,6 +210,32 @@ public class JSON {
 		}
 		return nbOccurences;
 	}
+	
+	public static List<Individual> fetchResultGeoHash(List<JSONObject> rawResult)
+	{
+		List<Individual> individuals = new ArrayList<Individual>(); //String = geohash d'une pos
+		
+		//Normalement un seul jo (un seul tour de boucle) mais sait-on jamais
+		for(JSONObject jo : rawResult)
+		{
+			JSONArray resultat = jo.getJSONArray("results");
+			resultat.forEach(item -> {
+				JSONObject obj = (JSONObject) item;
+				try
+				{
+					individuals.add(new Individual(obj.getString("id"), "", //identifiedBy n'existe pas dans la requete apparemment
+							new Specie(obj.getString("scientificName"), obj.getString("order"), ""))); //superclass non plus
+				}
+				catch(Exception e)
+				{
+					individuals.add(new Individual(obj.getString("id"), "", //identifiedBy n'existe pas dans la requete 
+							new Specie(obj.getString("scientificName"), "", ""))); //superclass non plus
+				}
+				
+			});
+		}
+		return individuals;
+	}
 
 
 
@@ -215,10 +243,10 @@ public class JSON {
 	public static void main(String[] args)
 	{
 		//HashMap<String, Long> nbOccurences = fetchResultSpecieOccurences(getFromFile("Delphinidae.json"));
-		List<String> names = fetchAutoIndent(getFromFile("agab.json"));
-		for (String string : names) 
+		List<Individual> names = fetchResultGeoHash(getFromFile("spd.json"));
+		for (Individual i : names) 
 		{
-			System.out.println(string);
+			System.out.println(i.getId());
 		}
 		/*for(Entry<String, Long> i : nbOccurences.entrySet())
 		{
