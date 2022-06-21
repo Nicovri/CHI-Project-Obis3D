@@ -51,6 +51,16 @@ public class Model implements ModelInterface {
 	public String getSpecieName() {
 		return this.currentSpecieName;
 	}
+	
+	@Override
+	public String getStartDate() {
+		return this.startdate;
+	}
+	
+	@Override
+	public String getEndDate() {
+		return this.enddate;
+	}
 
 	@Override
 	public void setSpecieName(String specieName) {

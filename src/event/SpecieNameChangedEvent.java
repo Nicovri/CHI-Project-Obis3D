@@ -25,7 +25,7 @@ public class SpecieNameChangedEvent extends Event {
 	
 	public Map<String, Long> getGeoHashAndNumberOfOccurrences() { return this.data; }
 	
-	public Pair<Long, Long> getMaxOccurrences() {
+	public Pair<Long, Long> getMaxMinOccurrences() {
 		long max = 0;
 		long min = 0;
 		if(data.isEmpty()) {

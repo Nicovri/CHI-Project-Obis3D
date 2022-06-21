@@ -10,6 +10,10 @@ public interface ControllerInterface {
 	
 	public String getSpecieName();
 	
+	public String getStartDate();
+	
+	public String getEndDate();
+	
 	public void setSpecieName(String specieName);
 	
 	public String getGeoHash();

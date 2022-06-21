@@ -47,6 +47,8 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
     
 	private Controller controller;
 	
+	private SecondView secondView;
+	
 	private Group root3D;
 	private Group occs;
 	
@@ -87,9 +89,9 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
         subscene.setFill(Color.GREY);
 		this.getChildren().add(subscene);
 		
-		occs.setScaleX(1.1);
-		occs.setScaleY(1.1);
-		occs.setScaleZ(1.1);
+		occs.setScaleX(1.001);
+		occs.setScaleY(1.001);
+		occs.setScaleZ(1.001);
 		root3D.getChildren().add(occs);
 		
         subscene.addEventHandler(MouseEvent.ANY, event -> {
@@ -97,35 +99,45 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
         		PickResult pickResult = event.getPickResult();
         		Point3D spaceCoord = pickResult.getIntersectedPoint();
         		
-        		Sphere sphere = new Sphere(0.01);
-        		sphere.setTranslateX(spaceCoord.getX());
-        		sphere.setTranslateY(spaceCoord.getY());
-        		sphere.setTranslateZ(spaceCoord.getZ());
-        		final PhongMaterial cursorMaterial = new PhongMaterial();
-        		cursorMaterial.setDiffuseColor(Color.RED);
-        		cursorMaterial.setSpecularColor(Color.RED);
-        		sphere.setMaterial(cursorMaterial);
-        		root3D.getChildren().add(sphere);
-        		
-        		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/SecondView.fxml"));
-        		Parent root = null;
-				try {
-					root = fxmlLoader.load();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-        		Stage stage = new Stage();
-        		stage.initModality(Modality.APPLICATION_MODAL);
-        		stage.setOpacity(1);
-        		stage.setTitle("Lists");
-        		stage.setScene(new Scene(root));
-        		stage.showAndWait();
-        		
-        		root3D.getChildren().remove(sphere);
-        		
         		Point2D cursor = spaceCoordToGeoCoord(spaceCoord);
         		Location loc = new Location("selectedGeoHash", cursor.getX(), cursor.getY());
-        		System.out.println(GeoHashHelper.getGeohash(loc, 3));
+        		        		
+        		if(!GeoHashHelper.getGeohash(loc, 3).equals("000")) {
+        			
+        			Sphere sphere = new Sphere(0.01);
+        			sphere.setTranslateX(spaceCoord.getX());
+        			sphere.setTranslateY(spaceCoord.getY());
+        			sphere.setTranslateZ(spaceCoord.getZ());
+        			final PhongMaterial cursorMaterial = new PhongMaterial();
+        			cursorMaterial.setDiffuseColor(Color.RED);
+        			cursorMaterial.setSpecularColor(Color.RED);
+        			sphere.setMaterial(cursorMaterial);
+        			root3D.getChildren().add(sphere);
+        			
+        			SecondView secondView = new SecondView(this.controller);
+        			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/SecondView.fxml"));
+        			fxmlLoader.setController(secondView);
+        			
+        			this.controller.addGeoHashListener(secondView);
+        			this.controller.notifyGeoHashChanged(GeoHashHelper.getGeohash(loc, 3));
+        			
+        			Parent root = null;
+        			try {
+        				root = fxmlLoader.load();
+        			} catch (IOException e) {
+        				e.printStackTrace();
+        			}
+        			Stage stage = new Stage();
+        			stage.initModality(Modality.APPLICATION_MODAL);
+        			stage.setOpacity(1);
+        			stage.setTitle("Lists");
+        			stage.setScene(new Scene(root));
+        			
+        			stage.showAndWait();
+        			
+        			root3D.getChildren().remove(sphere);
+        			
+        		}
         	}
         });
 	}
@@ -185,8 +197,8 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
     }
 
 	@Override
-	public void update(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc) {
-		if(maxMinOcc.getKey() > 0) {			
+	public void updateSpecie(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc) {
+		if(maxMinOcc.getKey() > 0) {
 			for(int i = 0; i < occs.getChildren().size(); i++) {			
 				occs.getChildren().remove(i);
 			}
@@ -248,6 +260,6 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
 
 	@Override
 	public void specieNameChanged(SpecieNameChangedEvent event) {
-		this.update(event.getSpecieName(), event.getGeoHashAndNumberOfOccurrences(), event.getMaxOccurrences());
+		this.updateSpecie(event.getSpecieName(), event.getGeoHashAndNumberOfOccurrences(), event.getMaxMinOccurrences());
 	}
 }

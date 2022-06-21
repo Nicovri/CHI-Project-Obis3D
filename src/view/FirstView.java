@@ -26,7 +26,7 @@ public class FirstView extends HBox {
 		
 		earthView = new EarthView(this.controller);
 		
-		playView = new PlayView();
+		playView = new PlayView(this.controller);
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PlayView.fxml"));
 		loader.setController(playView);
 		Parent play = null;
@@ -70,7 +70,7 @@ public class FirstView extends HBox {
 		this.getChildren().addAll(leftPane, rightPane);
 		
 		this.controller.addSpecieNameListener(earthView);
-//		this.controller.addSpecieNameListener(playView);
+		this.controller.addSpecieNameListener(playView);
 		this.controller.addSpecieNameListener(researchView);
 		this.controller.addSpecieNameListener(legendView);
 //		this.controller.addGeoHashListener(earthView);

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -9,8 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-
-<TabPane prefHeight="200.0" prefWidth="350.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17">
+<TabPane prefHeight="200.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
    <tabs>
       <Tab closable="false" text="Species">
         <content>
@@ -18,9 +18,9 @@
                <children>
                   <VBox prefHeight="180.0" prefWidth="213.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Label text="For the following GeoHash: ..." />
-                        <ListView prefHeight="151.0" />
-                        <Button mnemonicParsing="false" text="Search for selected specie" />
+                        <Label fx:id="geoHashLabel1" text="For the following GeoHash: ..." />
+                        <ListView fx:id="listViewSpecies" prefHeight="151.0" />
+                        <Button fx:id="useSelectedSpecieButton" mnemonicParsing="false" text="Search for selected specie" />
                      </children>
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -36,8 +36,8 @@
                <children>
                   <VBox prefHeight="180.0" prefWidth="213.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Label text="For the following GeoHash: ..." />
-                        <ListView prefHeight="151.0" />
+                        <Label fx:id="geoHashLabel2" text="For the following GeoHash: ..." />
+                        <Accordion fx:id="accordionIndividuals" />
                      </children>
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

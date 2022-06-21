@@ -18,6 +18,16 @@ public class Controller implements ControllerInterface {
 	public String getSpecieName() {
 		return this.model.getSpecieName();
 	}
+	
+	@Override
+	public String getStartDate() {
+		return this.model.getStartDate();
+	}
+	
+	@Override
+	public String getEndDate() {
+		return this.model.getEndDate();
+	}
 
 	@Override
 	public void setSpecieName(String specieName) {

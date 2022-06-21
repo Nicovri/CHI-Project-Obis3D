@@ -3,6 +3,8 @@ package event;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventType;
 import model.animal.Individual;
@@ -11,7 +13,7 @@ import model.animal.Specie;
 public class GeoHashChangedEvent extends Event {
 	public static String TYPE = "VALUE_CHANGED";
 	private String geoHash;
-	private List<Individual> individuals = new ArrayList<>();
+	private ObservableList<Individual> individuals = FXCollections.observableArrayList();
 	public final static EventType<GeoHashChangedEvent> VALUE_CHANGED = new EventType<>(TYPE);
 	
 	public GeoHashChangedEvent(Object source, String geoHash, List<Individual> individuals) {
@@ -22,9 +24,9 @@ public class GeoHashChangedEvent extends Event {
 	
 	public String getGeoHash() { return this.geoHash; }
 	
-	public List<Individual> getListIndividuals() { return this.individuals; }
+	public ObservableList<Individual> getListIndividuals() { return this.individuals; }
 	
-	public List<Specie> getListSpecie() {
+	public ObservableList<Specie> getListSpecie() {
 		// TODO
 		return null;
 	}

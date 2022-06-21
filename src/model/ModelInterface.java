@@ -10,8 +10,9 @@ public interface ModelInterface {
 	
 	public String getSpecieName();
 	
-	//public String getStartDate();
-	//public String getEndDate();
+	public String getStartDate();
+	
+	public String getEndDate();
 	
 	public void setSpecieName(String specieName);
 	

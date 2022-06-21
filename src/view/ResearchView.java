@@ -3,6 +3,7 @@ package view;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -87,9 +88,7 @@ public class ResearchView implements Initializable, ViewSpecieInterface, SpecieN
 //		searchBar.focusedProperty().addListener(event -> {
 //			if(searchBar.isFocused()) {				
 //				List<String> list = controller.getListSuggestions("Selachii");
-//				for(String s : list) {				
-//					suggestions.getItems().add(s);
-//				}
+//				suggestions.getItems().addAll(list);
 //				suggestions.setVisible(true);
 //			} else {
 //				for(String s : suggestions.getItems()) {					
@@ -111,7 +110,7 @@ public class ResearchView implements Initializable, ViewSpecieInterface, SpecieN
 	}
 
 	@Override
-	public void update(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc) {
+	public void updateSpecie(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc) {
 		if(maxMinOcc.getKey() > 0) {
 			this.correctSpecieName = specieName;
 			this.searchBar.setText(correctSpecieName);
@@ -124,6 +123,6 @@ public class ResearchView implements Initializable, ViewSpecieInterface, SpecieN
 
 	@Override
 	public void specieNameChanged(SpecieNameChangedEvent event) {
-		this.update(event.getSpecieName(), event.getGeoHashAndNumberOfOccurrences(), event.getMaxOccurrences());
+		this.updateSpecie(event.getSpecieName(), event.getGeoHashAndNumberOfOccurrences(), event.getMaxMinOccurrences());
 	}
 }
