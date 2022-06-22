@@ -32,6 +32,7 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.shape.TriangleMesh;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.util.Pair;
 import model.geohash.GeoHashHelper;
 import model.geohash.Location;
@@ -43,7 +44,7 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
     private static final float TEXTURE_LON_OFFSET = 2.8f;
     private static final float TEXTURE_OFFSET = 1.01f;
     
-    private static final int SIZE_RECT = 2;
+    private static final int SIZE_RECT = 1;
     
 	private Controller controller;
 	
@@ -51,6 +52,7 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
 	
 	private Group root3D;
 	private Group occs;
+	private Group pointer;
 	
 	public EarthView(Controller controller) {
 		this.controller = controller;
@@ -58,6 +60,8 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
 		root3D = new Group();
 		
 		occs = new Group();
+		
+		pointer = new Group();
 		
 		this.initializeEarthModel();
 	}
@@ -103,6 +107,8 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
         		Location loc = new Location("selectedGeoHash", cursor.getX(), cursor.getY());
         		        		
         		if(!GeoHashHelper.getGeohash(loc, 3).equals("000")) {
+        			pointer = new Group();
+        			root3D.getChildren().add(pointer);
         			
         			Sphere sphere = new Sphere(0.01);
         			sphere.setTranslateX(spaceCoord.getX());
@@ -112,14 +118,14 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
         			cursorMaterial.setDiffuseColor(Color.RED);
         			cursorMaterial.setSpecularColor(Color.RED);
         			sphere.setMaterial(cursorMaterial);
-        			root3D.getChildren().add(sphere);
+        			pointer.getChildren().add(sphere);
         			
-        			SecondView secondView = new SecondView(this.controller);
+        			secondView = new SecondView(this.controller);
+        			
         			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/SecondView.fxml"));
         			fxmlLoader.setController(secondView);
         			
         			this.controller.addGeoHashListener(secondView);
-        			this.controller.notifyGeoHashChanged(GeoHashHelper.getGeohash(loc, 3));
         			
         			Parent root = null;
         			try {
@@ -127,16 +133,18 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
         			} catch (IOException e) {
         				e.printStackTrace();
         			}
+        			
+        			this.controller.notifyGeoHashChanged(GeoHashHelper.getGeohash(loc, 3));
+        			
         			Stage stage = new Stage();
-        			stage.initModality(Modality.APPLICATION_MODAL);
+        			stage.initModality(Modality.APPLICATION_MODAL); // Modality.NONE
+//        			stage.setAlwaysOnTop(this.getScene().getWindow().isShowing());
         			stage.setOpacity(1);
         			stage.setTitle("Lists");
-        			stage.setScene(new Scene(root));
-        			
+        			stage.setScene(new Scene(root));        			
         			stage.showAndWait();
         			
-        			root3D.getChildren().remove(sphere);
-        			
+        			pointer.getChildren().clear();
         		}
         	}
         });
@@ -197,11 +205,9 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
     }
 
 	@Override
-	public void updateSpecie(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc) {
+	public void updateSpecie(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc, boolean is3D) {
 		if(maxMinOcc.getKey() > 0) {
-			for(int i = 0; i < occs.getChildren().size(); i++) {			
-				occs.getChildren().remove(i);
-			}
+			occs.getChildren().clear();
 			
 			Double scale = (maxMinOcc.getKey().longValue() - maxMinOcc.getValue().longValue()) / 8.0;
 			for(String geoHash : occurrences.keySet()) {
@@ -253,13 +259,17 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
 				Point3D bl = geoCoordTo3dCoord(la + SIZE_RECT, lo);
 				Point3D tl = geoCoordTo3dCoord(la + SIZE_RECT, lo + SIZE_RECT);
 				
-				this.addQuadrilateral(occs, tr, br, bl, tl, material);
+				if(!is3D) {
+					this.addQuadrilateral(occs, tr, br, bl, tl, material);
+				} else {
+//					this.addHistogram(occs, ...)
+				}
 			}
 		}
 	}
 
 	@Override
 	public void specieNameChanged(SpecieNameChangedEvent event) {
-		this.updateSpecie(event.getSpecieName(), event.getGeoHashAndNumberOfOccurrences(), event.getMaxMinOccurrences());
+		this.updateSpecie(event.getSpecieName(), event.getGeoHashAndNumberOfOccurrences(), event.getMaxMinOccurrences(), event.getIs3D());
 	}
 }

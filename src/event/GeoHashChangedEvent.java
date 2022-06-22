@@ -7,24 +7,24 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventType;
-import model.animal.Individual;
+import model.animal.Report;
 import model.animal.Specie;
 
 public class GeoHashChangedEvent extends Event {
-	public static String TYPE = "VALUE_CHANGED";
+	public static String TYPE = "VALUE_GEOHASH_CHANGED";
 	private String geoHash;
-	private ObservableList<Individual> individuals = FXCollections.observableArrayList();
-	public final static EventType<GeoHashChangedEvent> VALUE_CHANGED = new EventType<>(TYPE);
+	private ObservableList<Report> reports = FXCollections.observableArrayList();
+	public final static EventType<GeoHashChangedEvent> VALUE_GEOHASH_CHANGED = new EventType<>(TYPE);
 	
-	public GeoHashChangedEvent(Object source, String geoHash, List<Individual> individuals) {
-		super(VALUE_CHANGED);
+	public GeoHashChangedEvent(Object source, String geoHash, List<Report> reports) {
+		super(VALUE_GEOHASH_CHANGED);
 		this.geoHash = geoHash;
-		this.individuals.addAll(individuals);
+		this.reports.addAll(reports);
 	}
 	
 	public String getGeoHash() { return this.geoHash; }
 	
-	public ObservableList<Individual> getListIndividuals() { return this.individuals; }
+	public ObservableList<Report> getListReports() { return this.reports; }
 	
 	public ObservableList<Specie> getListSpecie() {
 		ObservableList<Specie> species = FXCollections.observableArrayList();

@@ -10,18 +10,22 @@ import javafx.event.EventType;
 import javafx.util.Pair;
 
 public class SpecieNameChangedEvent extends Event {
-	public static String TYPE = "VALUE_CHANGED";
+	public static String TYPE = "VALUE_SPECIE_CHANGED";
 	private String specieName;
+	private boolean is3D;
 	private Map<String, Long> data = new HashMap<>();
-	public final static EventType<SpecieNameChangedEvent> VALUE_CHANGED = new EventType<>(TYPE);
+	public final static EventType<SpecieNameChangedEvent> VALUE_SPECIE_CHANGED = new EventType<>(TYPE);
 	
-	public SpecieNameChangedEvent(Object source, String specieName, Map<String, Long> data) {
-		super(VALUE_CHANGED);
+	public SpecieNameChangedEvent(Object source, String specieName, Map<String, Long> data, boolean is3D) {
+		super(VALUE_SPECIE_CHANGED);
 		this.specieName = specieName;
 		this.data.putAll(data);
+		this.is3D = is3D;
 	}
 	
 	public String getSpecieName() { return this.specieName; }
+	
+	public boolean getIs3D() { return this.is3D; }
 	
 	public Map<String, Long> getGeoHashAndNumberOfOccurrences() { return this.data; }
 	

@@ -80,25 +80,25 @@ public class PlayView implements Initializable, ViewSpecieInterface, SpecieNameL
 	}
 
 	@Override
-	public void updateSpecie(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc) {
+	public void updateSpecie(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc, boolean is3D) {
 		String startdate = this.controller.getStartDate();
 		String enddate = this.controller.getEndDate();
 		
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-		
-		LocalDate localStartDate = LocalDate.parse(startdate, formatter);
-		LocalDate localEndDate = LocalDate.parse(enddate, formatter);
+		int startYear = Integer.parseInt(startdate.substring(0, 4));
+		String restStart = startdate.substring(4); 
+		int endYear = Integer.parseInt(enddate.substring(0, 4));
 		
 		this.timeline = new ArrayList<>();
 		
-//		while(localStartDate.isBefore(localEndDate)) {
-//			this.timeline.add(new Pair<>(localStartDate.toString(), localStartDate.toString()));
-//			localStartDate.plusYears(5);
-//		}
+		while(startYear < endYear) {
+			this.timeline.add(new Pair<>(Integer.toString(startYear) + restStart, Integer.toString(startYear+5) + restStart));
+			startYear += 5;
+		}
+		this.timeline.add(new Pair<>(Integer.toString(startYear) + restStart, enddate));
 	}
 	
 	@Override
 	public void specieNameChanged(SpecieNameChangedEvent event) {
-		this.updateSpecie(event.getSpecieName(), event.getGeoHashAndNumberOfOccurrences(), event.getMaxMinOccurrences());
+		this.updateSpecie(event.getSpecieName(), event.getGeoHashAndNumberOfOccurrences(), event.getMaxMinOccurrences(), event.getIs3D());
 	}
 }

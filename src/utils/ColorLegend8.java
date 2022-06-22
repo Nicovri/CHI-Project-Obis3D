@@ -3,7 +3,7 @@ package utils;
 import javafx.scene.paint.Color;
 
 public enum ColorLegend8 {
-	C1(Color.web("#250A0A")),
+	C1(Color.web("#4B1919")),
 	C2(Color.web("#3E008E")),
 	C3(Color.web("#0A2CBE")),
 	C4(Color.web("#01C2C7")),

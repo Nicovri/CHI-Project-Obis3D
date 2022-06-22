@@ -6,28 +6,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import event.GeoHashChangedEvent;
 import event.GeoHashListener;
 import event.SpecieNameChangedEvent;
 import event.SpecieNameListener;
-import model.animal.Individual;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import model.animal.Report;
 import model.animal.Specie;
-import utils.JSON;
+import utils.Requests;
 
 public class Model implements ModelInterface {
 	private String currentSpecieName;
 	private String startdate;
 	private String enddate;
+	private boolean is3D;
 	private Map<String, Long> occurrences;
 	
 	private String currentGeoHash;
-	private List<Individual> individuals;
+	private List<Report> reports;
 	
 	private List<SpecieNameListener> specieNameListeners;
 	private List<GeoHashListener> geoHashListeners;
 	
 	public Model() {
 		occurrences = new HashMap<>();
-		individuals = new ArrayList<>();
+		reports = new ArrayList<>();
 		
 		specieNameListeners = new ArrayList<>();
 		geoHashListeners = new ArrayList<>();
@@ -37,6 +41,7 @@ public class Model implements ModelInterface {
 		this.currentSpecieName = specieName;
 		this.startdate = "1027-01-01";
 		this.enddate = LocalDate.now().toString();
+		this.is3D = false;
 		this.fireSpecieNameChanged(true);
 	}
 	
@@ -44,6 +49,7 @@ public class Model implements ModelInterface {
 		this.currentSpecieName = specieName;
 		this.startdate = startdate;
 		this.enddate = enddate;
+		this.is3D = false;
 		this.fireSpecieNameChanged(true);
 	}
 	
@@ -76,6 +82,11 @@ public class Model implements ModelInterface {
 	@Override
 	public void setEndDate(String enddate) {
 		this.enddate = enddate;
+	}
+	
+	@Override
+	public void setIs3D(boolean is3D) {
+		this.is3D = is3D;
 	}
 
 	@Override
@@ -110,37 +121,35 @@ public class Model implements ModelInterface {
 	}
 	
 	@Override
-	public List<String> getListSuggestions(String text) {
-		List<String> suggestions = new ArrayList<>();
-		suggestions.add("test1");
-		suggestions.add("test2");
-		//getFromrequest("https://api.obis.org/v3/taxon/complete/verbose/" + text)
+	public ObservableList<String> getListSuggestions(String startName) {
+		ObservableList<String> suggestions = FXCollections.observableArrayList();
+		suggestions.addAll(Requests.fetchAutoIndent(Requests.getFromRequest(Requests.buildRequestAutoIndent(startName))));
 		return suggestions;
 	}
 	
 	@Override
 	public boolean updateOccurrences(boolean isInit) {
 		if(isInit) {
-			this.occurrences = JSON.fetchResultSpecieOccurences(JSON.getFromFile("/res/" + currentSpecieName + ".json"));
+			this.occurrences = Requests.fetchResultSpecieOccurences(Requests.getFromFile("/res/" + currentSpecieName + ".json"));
 			return true;
-		} else {			
-			this.occurrences = JSON.fetchResultSpecieOccurences(JSON.getFromRequest(JSON.buildSpecieRequestWithGrid(currentSpecieName, startdate, enddate, 3)));
+		} else {
+			this.occurrences = Requests.fetchResultSpecieOccurences(Requests.getFromRequest(Requests.buildSpecieRequestWithGrid(currentSpecieName, startdate, enddate, 3)));
 			return true;
 		}
 		// If something went wrong return false?
 	}
 	
 	@Override
-	public boolean updateIndividuals() {
-		// TODO
-		return false;
+	public boolean updateReports() {
+		this.reports = Requests.fetchResultGeoHash(Requests.getFromRequest(Requests.buildGeoHashRequest(currentGeoHash, "")));
+		return true;
 	}
 	
 	@Override
 	public void fireSpecieNameChanged(boolean isInit) {
 		if(this.updateOccurrences(isInit)) {			
 			for(SpecieNameListener s : specieNameListeners) {
-				s.specieNameChanged(new SpecieNameChangedEvent(this, currentSpecieName, occurrences));
+				s.specieNameChanged(new SpecieNameChangedEvent(this, currentSpecieName, occurrences, is3D));
 			}
 		}/* else {
 			this.setSpecie(this.currentSpecie.getScientificName());
@@ -149,9 +158,9 @@ public class Model implements ModelInterface {
 
 	@Override
 	public void fireGeoHashChanged() {
-		if(this.updateIndividuals()) {
+		if(this.updateReports()) {
 			for(GeoHashListener g : geoHashListeners) {
-				// TODO
+				g.geoHashChanged(new GeoHashChangedEvent(this, currentGeoHash, reports));
 			}
 		}
 	}

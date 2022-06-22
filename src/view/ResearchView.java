@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 import controller.Controller;
 import event.SpecieNameChangedEvent;
 import event.SpecieNameListener;
+import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -21,6 +22,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
@@ -79,24 +81,26 @@ public class ResearchView implements Initializable, ViewSpecieInterface, SpecieN
 		mode2DButton.setOnMouseClicked(event -> {
 			mode2DButton.setFont(fontBold);
 			mode3DButton.setFont(fontRegular);
+			controller.notifySpecieNameChanged(searchBar.getText(), false);
 		});
 		mode3DButton.setOnMouseClicked(event -> {
 			mode2DButton.setFont(fontRegular);
 			mode3DButton.setFont(fontBold);
+			controller.notifySpecieNameChanged(searchBar.getText(), true);
 		});
 		
-//		searchBar.focusedProperty().addListener(event -> {
-//			if(searchBar.isFocused()) {				
-//				List<String> list = controller.getListSuggestions("Selachii");
-//				suggestions.getItems().addAll(list);
-//				suggestions.setVisible(true);
-//			} else {
-//				for(String s : suggestions.getItems()) {					
-//					suggestions.getItems().remove(s);
-//				}
-//				suggestions.setVisible(false);
-//			}
-//		});
+		searchBar.textProperty().addListener(event -> {
+			suggestions.getItems().clear();
+			suggestions.getItems().addAll(controller.getListSuggestions(searchBar.getText()));
+		});
+		
+		searchBar.focusedProperty().addListener(event -> {
+			if(!(searchBar.isFocused() || suggestions.isFocused())) {
+				suggestions.setVisible(false);
+			} else {
+				suggestions.setVisible(true);
+			}
+		});
 		
 		searchBar.setOnKeyPressed(event -> {
 			if(event.getCode() == KeyCode.ENTER) {
@@ -107,22 +111,32 @@ public class ResearchView implements Initializable, ViewSpecieInterface, SpecieN
 		searchButton.setOnMouseClicked(event -> {
 			controller.notifySpecieNameChanged(searchBar.getText());
 		});
+		
+		suggestions.setOnMouseClicked(event -> {
+			if(event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 1) {
+				// Des fois, il n'y a pas d'occurrences, alors que l'espèce est proposée dans la liste
+				controller.notifySpecieNameChanged(suggestions.getSelectionModel().getSelectedItem());
+			}
+		});
 	}
 
 	@Override
-	public void updateSpecie(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc) {
+	public void updateSpecie(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc, boolean is3D) {
 		if(maxMinOcc.getKey() > 0) {
 			this.correctSpecieName = specieName;
 			this.searchBar.setText(correctSpecieName);
+			this.suggestions.getItems().clear();
+			suggestions.setVisible(false);
 		} else {
 			Alert error = new Alert(AlertType.ERROR, "The specie's scientific name is not in the database...", ButtonType.OK);
 			error.show();
 			this.searchBar.setText(correctSpecieName);
+//			this.searchBar.selectEnd();
 		}
 	}
 
 	@Override
 	public void specieNameChanged(SpecieNameChangedEvent event) {
-		this.updateSpecie(event.getSpecieName(), event.getGeoHashAndNumberOfOccurrences(), event.getMaxMinOccurrences());
+		this.updateSpecie(event.getSpecieName(), event.getGeoHashAndNumberOfOccurrences(), event.getMaxMinOccurrences(), event.getIs3D());
 	}
 }

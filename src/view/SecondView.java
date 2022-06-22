@@ -12,12 +12,15 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TitledPane;
-import model.animal.Individual;
+import javafx.scene.input.MouseButton;
+import model.animal.Report;
 import model.animal.Specie;
 
 public class SecondView implements Initializable, ViewGeoHashInterface, GeoHashListener {
@@ -33,7 +36,7 @@ public class SecondView implements Initializable, ViewGeoHashInterface, GeoHashL
 	private ListView<String> listViewSpecies;
 	
 	@FXML
-	private Accordion accordionIndividuals;
+	private Accordion accordionReports;
 	
 	@FXML
 	private Button useSelectedSpecieButton;
@@ -44,30 +47,47 @@ public class SecondView implements Initializable, ViewGeoHashInterface, GeoHashL
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		this.geoHashLabel1.setText("For the following GeoHash: " + controller.getGeoHash());
-		this.geoHashLabel2.setText("For the following GeoHash: " + controller.getGeoHash());
 		
-//		this.listViewSpecies.getSelectionModel().selectedItemProperty().addListener(null);
+		this.listViewSpecies.setOnMouseClicked(event -> {
+			if(event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
+				controller.notifySpecieNameChanged(listViewSpecies.getSelectionModel().getSelectedItem());
+			}
+		});
 		
-		ObservableList<String> specieItems = FXCollections.observableArrayList();
-		specieItems.add("test1");
-		specieItems.add("test2");
+		this.useSelectedSpecieButton.setOnMouseClicked(event -> {
+			controller.notifySpecieNameChanged(listViewSpecies.getSelectionModel().getSelectedItem());
+		});
 		
-		this.listViewSpecies.getItems().addAll(specieItems);
-		
-		ObservableList<TitledPane> individualItems = FXCollections.observableArrayList();
-		individualItems.add(new TitledPane("title", new Label("scientificName\nOrder\nClass\nRecordedBy")));
-		this.accordionIndividuals.getPanes().addAll(individualItems);
 	}
 
 	@Override
-	public void updateGeoHash(String geoHash, ObservableList<Individual> individuals, ObservableList<Specie> species) {
+	public void updateGeoHash(String geoHash, ObservableList<Report> reports, ObservableList<Specie> species) {
 		this.geoHashLabel1.setText("For the following GeoHash: " + geoHash);
 		this.geoHashLabel2.setText("For the following GeoHash: " + geoHash);
+		
+		ObservableList<String> specieItems = FXCollections.observableArrayList();
+		for(Specie s : species) {
+			specieItems.add(s.getScientificName());
+		}
+		
+		this.listViewSpecies.getItems().clear();
+		
+		this.listViewSpecies.getItems().addAll(specieItems);
+		
+		ObservableList<TitledPane> reportItems = FXCollections.observableArrayList();
+		for(Report r : reports) {			
+			reportItems.add(
+					new TitledPane(r.getId(),
+					new Label("scientificName: " + r.getSpecie().getScientificName() + "\n"
+							+ "order: " + r.getSpecie().getOrder() + "\n"
+							+ "class: " + r.getSpecie().getSuperClass() + "\n"
+							+ "recordedBy: " + r.getRecordedBy())));
+		}
+		this.accordionReports.getPanes().addAll(reportItems);
 	}
 
 	@Override
 	public void geoHashChanged(GeoHashChangedEvent event) {
-		this.updateGeoHash(event.getGeoHash(), event.getListIndividuals(), event.getListSpecie());
+		this.updateGeoHash(event.getGeoHash(), event.getListReports(), event.getListSpecie());
 	}
 }

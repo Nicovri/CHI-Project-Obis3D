@@ -4,6 +4,7 @@ import java.util.List;
 
 import event.GeoHashListener;
 import event.SpecieNameListener;
+import javafx.collections.ObservableList;
 import model.animal.Specie;
 
 public interface ModelInterface {
@@ -20,6 +21,8 @@ public interface ModelInterface {
 	
 	public void setEndDate(String enddate);
 	
+	public void setIs3D(boolean is3D);
+	
 	public String getGeoHash();
 	
 	public void setGeoHash(String geoHash);
@@ -32,11 +35,11 @@ public interface ModelInterface {
 	
 	public void removeGeoHashListener(GeoHashListener geoHashListener);
 	
-	public List<String> getListSuggestions(String text);
+	public ObservableList<String> getListSuggestions(String startName);
 	
 	public boolean updateOccurrences(boolean isInit);
 	
-	public boolean updateIndividuals();
+	public boolean updateReports();
 	
 	public void fireSpecieNameChanged(boolean isInit);
 	

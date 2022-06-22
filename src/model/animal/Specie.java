@@ -4,29 +4,28 @@ public class Specie {
 	private String scientificName;
 	private String order;
 	private String superClass;
-
-	public Specie(String scientificName, String order, String superClass)
-	{
+	
+	public Specie(String scientificName, String order, String superClass) {
 		this.scientificName = scientificName;
 		this.order = order;
 		this.superClass = superClass;
 	}
-
-	public String getScientificName()
+	
+	public String getScientificName() 
 	{
 		return scientificName;
 	}
-
-	public String getOrder()
+	
+	public String getOrder() 
 	{
 		return order;
 	}
-
-	public String getSuperClass()
+	
+	public String getSuperClass() 
 	{
 		return superClass;
 	}
-
+	
 	@Override
 	public boolean equals(Object o)
 	{
@@ -39,4 +38,3 @@ public class Specie {
 		return false;
 	}
 }
-

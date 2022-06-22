@@ -32,7 +32,11 @@ public interface ControllerInterface {
 	
 	public void notifySpecieNameChanged(String specieName);
 	
+	public void notifySpecieNameChanged(String specieName, boolean is3D);
+	
 	public void notifySpecieNameAndDateChanged(String specieName, String startdate, String enddate);
+	
+	public void notifySpecieNameAndDateChanged(String specieName, String startdate, String enddate, boolean is3D);
 	
 	public void notifyGeoHashChanged(String geoHash);
 }

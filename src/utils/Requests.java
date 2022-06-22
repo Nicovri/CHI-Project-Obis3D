@@ -9,27 +9,33 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandler;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
 import javafx.util.Pair;
-import model.Individual;
-import model.Specie;
+import model.animal.Report;
+import model.animal.Specie;
 import model.geohash.GeoHashHelper;
 import model.geohash.Location;
 
-public class JSON {
+public class Requests {
 
 	private static String readAll(Reader rd) throws IOException
 	{
@@ -48,7 +54,7 @@ public class JSON {
 	{
 		try
 		{
-			InputStream input = JSON.class.getResourceAsStream(path);
+			InputStream input = Requests.class.getResourceAsStream(path);
 			Reader reader = new InputStreamReader(input);
 			BufferedReader rd = new BufferedReader(reader);
 			String jsonText = readAll(rd);
@@ -121,7 +127,9 @@ public class JSON {
 	public static String buildGeoHashRequest(String geohash, String specieName)//String s = GeoHash plus tard
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("https://api.obis.org/v3/occurrence/grid/3?");
+		// pas besoin de /grid/3 ici, sinon on n'a pas les infos des signalements
+		sb.append("https://api.obis.org/v3/occurrence?");
+		// pas besoin de specieName? (on regarde les espËces en fonction de l'espËce dÈj‡ entrÈe ou juste en gÈnÈral?)
 		if(!specieName.equals(""))
 		{
 			specieName = specieName.replace(" ", "%20");
@@ -186,34 +194,40 @@ public class JSON {
 		//Normalement un seul jo (un seul tour de boucle) mais sait-on jamais
 		for(JSONObject jo : rawResult)
 		{
-			JSONArray resultat = jo.getJSONArray("features");
-			resultat.forEach(item -> {
-				JSONObject pos = (JSONObject) item;
-				JSONObject coord = pos.getJSONObject("geometry");
-				JSONArray temp = coord.getJSONArray("coordinates");
-				temp.forEach(carre -> {
-
-					Pair<BigDecimal, BigDecimal> a, c, milieu; //On veut calculer le centre du carr√© g√©o, qui vaut le milieu du segment AC
-					JSONArray temp_coord = (JSONArray) carre;
-					a = new Pair<>(new BigDecimal(temp_coord.getJSONArray(0).get(0).toString()), new BigDecimal(temp_coord.getJSONArray(0).get(1).toString()));
-					c = new Pair<>(new BigDecimal(temp_coord.getJSONArray(2).get(0).toString()), new BigDecimal(temp_coord.getJSONArray(2).get(1).toString()));
-					milieu = new Pair<>((a.getKey().add(c.getKey())).divide(new BigDecimal("2.0")), (a.getValue().add(c.getValue())).divide(new BigDecimal("2.0")));
-					System.out.println(milieu.getKey().doubleValue() +":"+milieu.getValue().doubleValue());
-					System.out.println(GeoHashHelper.getGeohash(new Location("", milieu.getKey().doubleValue(), milieu.getValue().doubleValue()), 3));
-					Long nb = pos.getJSONObject("properties").getLong("n");
-					// Precision a modifier en fonction du nombre entre(occurrence/grid/n? precision de n) (geohash spd precision 3, geohash spdef precision 5)
-					// Ou mettre 3 tout le temps (pour correspondre a grid/3 de la fonction buildGeoHashRequest)
-					// On en a besoin pour connaitre la taille du rectangle a dessiner sur la Terre
-					nbOccurences.put(GeoHashHelper.getGeohash(new Location("", milieu.getKey().doubleValue(), milieu.getValue().doubleValue()), 3), nb);
+			
+			try
+			{
+				
+				JSONArray resultat = jo.getJSONArray("features");
+				resultat.forEach(item -> {
+					JSONObject pos = (JSONObject) item;
+					JSONObject coord = pos.getJSONObject("geometry");
+					JSONArray temp = coord.getJSONArray("coordinates");
+					temp.forEach(carre -> {
+						
+						Pair<BigDecimal, BigDecimal> a, c, milieu; //On veut calculer le centre du carr√© g√©o, qui vaut le milieu du segment AC
+						JSONArray temp_coord = (JSONArray) carre;
+						a = new Pair<>(new BigDecimal(temp_coord.getJSONArray(0).get(1).toString()), new BigDecimal(temp_coord.getJSONArray(0).get(0).toString()));
+						c = new Pair<>(new BigDecimal(temp_coord.getJSONArray(2).get(1).toString()), new BigDecimal(temp_coord.getJSONArray(2).get(0).toString()));
+						milieu = new Pair<>((a.getKey().add(c.getKey())).divide(new BigDecimal("2.0")), (a.getValue().add(c.getValue())).divide(new BigDecimal("2.0")));
+						Long nb = pos.getJSONObject("properties").getLong("n");
+						// Precision a modifier en fonction du nombre entre(occurrence/grid/n? precision de n) (geohash spd precision 3, geohash spdef precision 5)
+						// Ou mettre 3 tout le temps (pour correspondre a grid/3 de la fonction buildGeoHashRequest)
+						// On en a besoin pour connaitre la taille du rectangle a dessiner sur la Terre
+						nbOccurences.put(GeoHashHelper.getGeohash(new Location("", milieu.getKey().doubleValue(), milieu.getValue().doubleValue()), 3), nb);
+					});
 				});
-			});
+				
+			} catch(JSONException e) {
+				//
+			}
 		}
 		return nbOccurences;
 	}
 	
-	public static List<Individual> fetchResultGeoHash(List<JSONObject> rawResult)
+	public static List<Report> fetchResultGeoHash(List<JSONObject> rawResult)
 	{
-		List<Individual> individuals = new ArrayList<Individual>(); //String = geohash d'une pos
+		List<Report> individuals = new ArrayList<Report>(); //String = geohash d'une pos
 		
 		//Normalement un seul jo (un seul tour de boucle) mais sait-on jamais
 		for(JSONObject jo : rawResult)
@@ -223,12 +237,12 @@ public class JSON {
 				JSONObject obj = (JSONObject) item;
 				try
 				{
-					individuals.add(new Individual(obj.getString("id"), "", //identifiedBy n'existe pas dans la requete apparemment
+					individuals.add(new Report(obj.getString("id"), "", //identifiedBy n'existe pas dans la requete apparemment
 							new Specie(obj.getString("scientificName"), obj.getString("order"), ""))); //superclass non plus
 				}
 				catch(Exception e)
 				{
-					individuals.add(new Individual(obj.getString("id"), "", //identifiedBy n'existe pas dans la requete 
+					individuals.add(new Report(obj.getString("id"), "", //identifiedBy n'existe pas dans la requete 
 							new Specie(obj.getString("scientificName"), "", ""))); //superclass non plus
 				}
 				
@@ -236,23 +250,15 @@ public class JSON {
 		}
 		return individuals;
 	}
-
-
-
-	//Tests
+	
 	public static void main(String[] args)
 	{
-		//HashMap<String, Long> nbOccurences = fetchResultSpecieOccurences(getFromFile("Delphinidae.json"));
-		List<Individual> names = fetchResultGeoHash(getFromFile("spd.json"));
-		for (Individual i : names) 
-		{
-			System.out.println(i.getId());
-		}
-		/*for(Entry<String, Long> i : nbOccurences.entrySet())
+		/*HashMap<String, Long> nbOccurences = fetchResultSpecieOccurences(getFromRequest(buildSpecieRequestWithGrid("Delphinidae", "3")));
+		for(Entry<String, Long> i : nbOccurences.entrySet())
 		{
 			System.out.println(i);
 		}*/
-
+		
 		/*for(String s : nbOccurences.keySet()) {
 			System.out.println(s);
 		}*/

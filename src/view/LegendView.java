@@ -96,7 +96,7 @@ public class LegendView implements Initializable, ViewSpecieInterface, SpecieNam
 	}
 
 	@Override
-	public void updateSpecie(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc) {
+	public void updateSpecie(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc, boolean is3D) {
 		if(maxMinOcc.getKey() > 0) {			
 			Double scale = (maxMinOcc.getKey().longValue() - maxMinOcc.getValue().longValue()) / 8.0;
 			label1.setText("From " + maxMinOcc.getValue().longValue() + " to " + Math.round(scale*1));
@@ -112,7 +112,7 @@ public class LegendView implements Initializable, ViewSpecieInterface, SpecieNam
 
 	@Override
 	public void specieNameChanged(SpecieNameChangedEvent event) {
-		this.updateSpecie(event.getSpecieName(), event.getGeoHashAndNumberOfOccurrences(), event.getMaxMinOccurrences());
+		this.updateSpecie(event.getSpecieName(), event.getGeoHashAndNumberOfOccurrences(), event.getMaxMinOccurrences(), event.getIs3D());
 	}
 
 }
