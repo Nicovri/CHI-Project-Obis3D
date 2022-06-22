@@ -27,7 +27,11 @@ public class GeoHashChangedEvent extends Event {
 	public ObservableList<Individual> getListIndividuals() { return this.individuals; }
 	
 	public ObservableList<Specie> getListSpecie() {
-		// TODO
-		return null;
+		ObservableList<Specie> species = FXCollections.observableArrayList();
+		for(Report r : reports)
+		{
+			if(!species.contains(r.getSpecie())) species.add(r.getSpecie());
+		}
+		return species;
 	}
 }
