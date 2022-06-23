@@ -34,6 +34,7 @@ import model.animal.Report;
 import model.animal.Specie;
 import model.geohash.GeoHashHelper;
 import model.geohash.Location;
+import java.time.LocalDate;
 
 public class Requests {
 
@@ -129,7 +130,7 @@ public class Requests {
 		StringBuilder sb = new StringBuilder();
 		// pas besoin de /grid/3 ici, sinon on n'a pas les infos des signalements
 		sb.append("https://api.obis.org/v3/occurrence?");
-		// pas besoin de specieName? (on regarde les espËces en fonction de l'espËce dÈj‡ entrÈe ou juste en gÈnÈral?)
+		// pas besoin de specieName? (on regarde les esp√®ces en fonction de l'esp√®ce d√©j√† entr√©e ou juste en g√©n√©ral?)
 		if(!specieName.equals(""))
 		{
 			specieName = specieName.replace(" ", "%20");
@@ -205,7 +206,7 @@ public class Requests {
 					JSONArray temp = coord.getJSONArray("coordinates");
 					temp.forEach(carre -> {
 						
-						Pair<BigDecimal, BigDecimal> a, c, milieu; //On veut calculer le centre du carr√© g√©o, qui vaut le milieu du segment AC
+						Pair<BigDecimal, BigDecimal> a, c, milieu; //On veut calculer le centre du carr√É¬© g√É¬©o, qui vaut le milieu du segment AC
 						JSONArray temp_coord = (JSONArray) carre;
 						a = new Pair<>(new BigDecimal(temp_coord.getJSONArray(0).get(1).toString()), new BigDecimal(temp_coord.getJSONArray(0).get(0).toString()));
 						c = new Pair<>(new BigDecimal(temp_coord.getJSONArray(2).get(1).toString()), new BigDecimal(temp_coord.getJSONArray(2).get(0).toString()));
@@ -225,6 +226,24 @@ public class Requests {
 		return nbOccurences;
 	}
 	
+	public static List<HashMap<String, Long>> timeIntervals(String specieName, String _startDate, String _endDate)
+	{
+		List<HashMap<String, Long>> intervals = new ArrayList<HashMap<String, Long>>();
+		LocalDate startDate = LocalDate.parse(_startDate);
+		LocalDate endDate = LocalDate.parse(_endDate);
+		while(startDate.plusYears(5).isBefore(endDate))
+		{
+			intervals.add(fetchResultSpecieOccurences(getFromRequest(
+					buildSpecieRequestWithGrid(specieName, startDate.toString(), startDate.plusYears(5).toString(), 3))));
+			startDate = startDate.plusYears(5);
+		}
+		intervals.add(fetchResultSpecieOccurences(getFromRequest(
+				buildSpecieRequestWithGrid(specieName, startDate.toString(), endDate.toString(), 3))));
+
+		return intervals;
+	}
+	
+	//pas finie
 	public static List<Report> fetchResultGeoHash(List<JSONObject> rawResult)
 	{
 		List<Report> individuals = new ArrayList<Report>(); //String = geohash d'une pos
