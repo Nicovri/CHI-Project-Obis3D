@@ -12,6 +12,15 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+/**
+ * Vue responsable de coordonner les vues de la fenêtre principale.
+ * 
+ * @version 1.0.0
+ * 
+ * @author Nicolas Vrignaud
+ * @author Ruben Delamarche
+ *
+ */
 public class FirstView extends HBox {
 	private Controller controller;
 	
@@ -73,6 +82,5 @@ public class FirstView extends HBox {
 		this.controller.addSpecieNameListener(playView);
 		this.controller.addSpecieNameListener(researchView);
 		this.controller.addSpecieNameListener(legendView);
-//		this.controller.addGeoHashListener(earthView);
 	}
 }

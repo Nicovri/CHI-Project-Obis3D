@@ -31,7 +31,7 @@
             </AnchorPane>
         </content>
       </Tab>
-      <Tab closable="false" text="Individuals">
+      <Tab closable="false" text="Reports">
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>

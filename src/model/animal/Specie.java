@@ -1,11 +1,21 @@
 package model.animal;
 
+/**
+ * Classe représentant une espèce.
+ * 
+ * @version 1.0.0
+ * 
+ * @author Nicolas Vrignaud
+ * @author Ruben Delamarche
+ *
+ */
 public class Specie {
 	private String scientificName;
 	private String order;
 	private String superClass;
 	
-	public Specie(String scientificName, String order, String superClass) {
+	public Specie(String scientificName, String order, String superClass)
+	{
 		this.scientificName = scientificName;
 		this.order = order;
 		this.superClass = superClass;

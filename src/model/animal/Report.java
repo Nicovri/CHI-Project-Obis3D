@@ -1,5 +1,14 @@
 package model.animal;
 
+/**
+ * Classe représentant un signalement d'individu d'une espèce donnée.
+ * 
+ * @version 1.0.0
+ * 
+ * @author Nicolas Vrignaud
+ * @author Ruben Delamarche
+ *
+ */
 public class Report {
 	private String id;
 	private String recordedBy;

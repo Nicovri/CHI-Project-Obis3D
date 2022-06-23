@@ -3,6 +3,8 @@ package test;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
+import utils.Requests;
+
 
 public class SimpleTest {
 
@@ -31,6 +33,3 @@ public class SimpleTest {
 	//TODO: Add more test
 
 }
-
-
-

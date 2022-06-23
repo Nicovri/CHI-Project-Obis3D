@@ -1,14 +1,22 @@
 package event;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.util.Pair;
 
+/**
+ * Evénement propagé lorsque la valeur du nom d'espèce est modifiée.
+ * 
+ * @version 1.0.0
+ * 
+ * @author Nicolas Vrignaud
+ * @author Ruben Delamarche
+ *
+ */
+@SuppressWarnings("serial")
 public class SpecieNameChangedEvent extends Event {
 	public static String TYPE = "VALUE_SPECIE_CHANGED";
 	private String specieName;

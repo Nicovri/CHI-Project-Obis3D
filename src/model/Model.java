@@ -13,9 +13,17 @@ import event.SpecieNameListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.animal.Report;
-import model.animal.Specie;
 import utils.Requests;
 
+/**
+ * Modèle principal de l'application.
+ * 
+ * @version 1.0.0
+ * 
+ * @author Nicolas Vrignaud
+ * @author Ruben Delamarche
+ *
+ */
 public class Model implements ModelInterface {
 	private String currentSpecieName;
 	private String startdate;
@@ -75,6 +83,12 @@ public class Model implements ModelInterface {
 	}
 	
 	@Override
+	public void setSpecieName(String specieName, Map<String, Long> occurrences) {
+		this.currentSpecieName = specieName;
+		this.fireSpecieNameChanged(occurrences);
+	}
+	
+	@Override
 	public void setStartDate(String startdate) {
 		this.startdate = startdate;
 	}
@@ -123,8 +137,16 @@ public class Model implements ModelInterface {
 	@Override
 	public ObservableList<String> getListSuggestions(String startName) {
 		ObservableList<String> suggestions = FXCollections.observableArrayList();
-		suggestions.addAll(Requests.fetchAutoIndent(Requests.getFromRequest(Requests.buildRequestAutoIndent(startName))));
+		List<String> autoIndent = Requests.fetchAutoIndent(Requests.getFromRequest(Requests.buildRequestAutoIndent(startName)));
+		if(autoIndent != null) {			
+			suggestions.addAll(Requests.fetchAutoIndent(Requests.getFromRequest(Requests.buildRequestAutoIndent(startName))));
+		}
 		return suggestions;
+	}
+	
+	@Override
+	public List<Map<String, Long>> getOccurrencesPerInterval() {
+		return Requests.fetchTimeIntervals(currentSpecieName, startdate, enddate);
 	}
 	
 	@Override
@@ -134,9 +156,12 @@ public class Model implements ModelInterface {
 			return true;
 		} else {
 			this.occurrences = Requests.fetchResultSpecieOccurences(Requests.getFromRequest(Requests.buildSpecieRequestWithGrid(currentSpecieName, startdate, enddate, 3)));
+			System.out.println(Requests.buildSpecieRequestWithGrid(currentSpecieName, startdate, enddate, 3));
+			if(this.occurrences == null) {
+				return false;
+			}
 			return true;
 		}
-		// If something went wrong return false?
 	}
 	
 	@Override
@@ -147,13 +172,18 @@ public class Model implements ModelInterface {
 	
 	@Override
 	public void fireSpecieNameChanged(boolean isInit) {
-		if(this.updateOccurrences(isInit)) {			
+		if(this.updateOccurrences(isInit)) {
 			for(SpecieNameListener s : specieNameListeners) {
 				s.specieNameChanged(new SpecieNameChangedEvent(this, currentSpecieName, occurrences, is3D));
 			}
-		}/* else {
-			this.setSpecie(this.currentSpecie.getScientificName());
-		}*/
+		}
+	}
+	
+	@Override
+	public void fireSpecieNameChanged(Map<String, Long> occurrences) {
+		for(SpecieNameListener s : specieNameListeners) {
+			s.specieNameChanged(new SpecieNameChangedEvent(this, currentSpecieName, occurrences, is3D));
+		}
 	}
 
 	@Override

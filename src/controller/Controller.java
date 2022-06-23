@@ -1,12 +1,23 @@
 package controller;
 
 import java.util.List;
+import java.util.Map;
 
 import event.GeoHashListener;
 import event.SpecieNameListener;
 import model.Model;
-import model.animal.Specie;
 
+/**
+ * Controlleur principal de l'application.
+ * 
+ * @version 1.0.0
+ * 
+ * @author Nicolas Vrignaud
+ * @author Ruben Delamarche
+ * 
+ * @see controller.ControllerInterface
+ *
+ */
 public class Controller implements ControllerInterface {
 	private Model model;
 	
@@ -68,10 +79,20 @@ public class Controller implements ControllerInterface {
 	public List<String> getListSuggestions(String text) {
 		return this.model.getListSuggestions(text);
 	}
+	
+	@Override
+	public List<Map<String, Long>> getOccurrencesPerInterval() {
+		return this.model.getOccurrencesPerInterval();
+	}
 
 	@Override
 	public void notifySpecieNameChanged(String specieName) {
 		this.model.setSpecieName(specieName);
+	}
+	
+	@Override
+	public void notifySpecieNameChanged(String specieName, Map<String, Long> occurrences) {
+		this.model.setSpecieName(specieName, occurrences);
 	}
 	
 	@Override

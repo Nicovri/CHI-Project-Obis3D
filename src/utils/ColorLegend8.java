@@ -2,6 +2,15 @@ package utils;
 
 import javafx.scene.paint.Color;
 
+/**
+ * Enumération utilisée pour spécifier les couleurs de la légende et des zones ajoutées sur la Terre.
+ * 
+ * @version 1.0.0
+ * 
+ * @author Nicolas Vrignaud
+ * @author Ruben Delamarche
+ *
+ */
 public enum ColorLegend8 {
 	C1(Color.web("#4B1919")),
 	C2(Color.web("#3E008E")),

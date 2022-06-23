@@ -23,7 +23,17 @@ import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import utils.ColorLegend8;
 
+/**
+ * Vue responsable de l'affichage de la légende et du nombre minimal et maximal pour chaque couleur.
+ * 
+ * @version 1.0.0
+ * 
+ * @author Nicolas Vrignaud
+ * @author Ruben Delamarche
+ *
+ */
 public class LegendView implements Initializable, ViewSpecieInterface, SpecieNameListener {
+	@SuppressWarnings("unused")
 	private Controller controller;
 	
 	@FXML
@@ -97,7 +107,8 @@ public class LegendView implements Initializable, ViewSpecieInterface, SpecieNam
 
 	@Override
 	public void updateSpecie(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc, boolean is3D) {
-		if(maxMinOcc.getKey() > 0) {			
+		if(maxMinOcc.getKey() > 0) {
+			// Selon le nombre d'occurrences max et min, on change le nombre minimal et maximal pour chaque couleur
 			Double scale = (maxMinOcc.getKey().longValue() - maxMinOcc.getValue().longValue()) / 8.0;
 			label1.setText("From " + maxMinOcc.getValue().longValue() + " to " + Math.round(scale*1));
 			label2.setText("From " + Math.round(scale*1) + " to " + Math.round(scale*2));

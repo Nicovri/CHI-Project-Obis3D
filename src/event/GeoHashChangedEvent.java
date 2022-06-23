@@ -1,6 +1,5 @@
 package event;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javafx.collections.FXCollections;
@@ -10,6 +9,16 @@ import javafx.event.EventType;
 import model.animal.Report;
 import model.animal.Specie;
 
+/**
+ * Evénement propagé lorsque la valeur du géohash est modifiée.
+ * 
+ * @version 1.0.0
+ * 
+ * @author Nicolas Vrignaud
+ * @author Ruben Delamarche
+ *
+ */
+@SuppressWarnings("serial")
 public class GeoHashChangedEvent extends Event {
 	public static String TYPE = "VALUE_GEOHASH_CHANGED";
 	private String geoHash;
@@ -19,7 +28,9 @@ public class GeoHashChangedEvent extends Event {
 	public GeoHashChangedEvent(Object source, String geoHash, List<Report> reports) {
 		super(VALUE_GEOHASH_CHANGED);
 		this.geoHash = geoHash;
-		this.reports.addAll(reports);
+		if(reports != null) {			
+			this.reports.addAll(reports);
+		}
 	}
 	
 	public String getGeoHash() { return this.geoHash; }

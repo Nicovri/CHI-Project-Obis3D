@@ -1,28 +1,24 @@
 package utils;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandler;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
@@ -34,8 +30,16 @@ import model.animal.Report;
 import model.animal.Specie;
 import model.geohash.GeoHashHelper;
 import model.geohash.Location;
-import java.time.LocalDate;
 
+/**
+ * Classe de fonctions statiques qui s'occupe de construire et d'exploiter les requÍtes nÈcessaires ‡ l'application.
+ * 
+ * @version 1.0.0
+ * 
+ * @author Nicolas Vrignaud
+ * @author Ruben Delamarche
+ *
+ */
 public class Requests {
 
 	private static String readAll(Reader rd) throws IOException
@@ -102,9 +106,10 @@ public class Requests {
 		{
 			jsonText = client.sendAsync(request, BodyHandlers.ofString())
 					.thenApply(HttpResponse::body).get(10, TimeUnit.SECONDS);
-		}catch(Exception e)
+		}
+		catch(Exception e)
 		{
-			e.printStackTrace();
+			return null;
 		}
 		ArrayList<JSONObject> listJson = new ArrayList<JSONObject>();
 		if(jsonText.charAt(0)=='{')
@@ -130,7 +135,7 @@ public class Requests {
 		StringBuilder sb = new StringBuilder();
 		// pas besoin de /grid/3 ici, sinon on n'a pas les infos des signalements
 		sb.append("https://api.obis.org/v3/occurrence?");
-		// pas besoin de specieName? (on regarde les esp√®ces en fonction de l'esp√®ce d√©j√† entr√©e ou juste en g√©n√©ral?)
+		// pas besoin de specieName? (on regarde les espËces en fonction de l'espËce dÈj‡ entrÈe ou juste en gÈnÈral?)
 		if(!specieName.equals(""))
 		{
 			specieName = specieName.replace(" ", "%20");
@@ -180,6 +185,10 @@ public class Requests {
 
 	public static List<String> fetchAutoIndent(List<JSONObject> rawResult)
 	{
+		if(rawResult == null) {
+			return null;
+		}
+		
 		List<String> listName = new ArrayList<String>();
 		for(JSONObject jo : rawResult)
 		{
@@ -190,6 +199,9 @@ public class Requests {
 
 	public static HashMap<String, Long> fetchResultSpecieOccurences(List<JSONObject> rawResult)
 	{
+		if(rawResult == null) {
+			return null;
+		}
 		HashMap<String, Long> nbOccurences = new HashMap<>(); //String = geohash d'une pos
 		
 		//Normalement un seul jo (un seul tour de boucle) mais sait-on jamais
@@ -206,7 +218,7 @@ public class Requests {
 					JSONArray temp = coord.getJSONArray("coordinates");
 					temp.forEach(carre -> {
 						
-						Pair<BigDecimal, BigDecimal> a, c, milieu; //On veut calculer le centre du carr√É¬© g√É¬©o, qui vaut le milieu du segment AC
+						Pair<BigDecimal, BigDecimal> a, c, milieu; //On veut calculer le centre du carr√© g√©o, qui vaut le milieu du segment AC
 						JSONArray temp_coord = (JSONArray) carre;
 						a = new Pair<>(new BigDecimal(temp_coord.getJSONArray(0).get(1).toString()), new BigDecimal(temp_coord.getJSONArray(0).get(0).toString()));
 						c = new Pair<>(new BigDecimal(temp_coord.getJSONArray(2).get(1).toString()), new BigDecimal(temp_coord.getJSONArray(2).get(0).toString()));
@@ -226,9 +238,9 @@ public class Requests {
 		return nbOccurences;
 	}
 	
-	public static List<HashMap<String, Long>> timeIntervals(String specieName, String _startDate, String _endDate)
+	public static List<Map<String, Long>> fetchTimeIntervals(String specieName, String _startDate, String _endDate)
 	{
-		List<HashMap<String, Long>> intervals = new ArrayList<HashMap<String, Long>>();
+		List<Map<String, Long>> intervals = new ArrayList<Map<String, Long>>();
 		LocalDate startDate = LocalDate.parse(_startDate);
 		LocalDate endDate = LocalDate.parse(_endDate);
 		while(startDate.plusYears(5).isBefore(endDate))
@@ -243,9 +255,12 @@ public class Requests {
 		return intervals;
 	}
 	
-	//pas finie
 	public static List<Report> fetchResultGeoHash(List<JSONObject> rawResult)
 	{
+		if(rawResult == null) {
+			return null;
+		}
+		
 		List<Report> individuals = new ArrayList<Report>(); //String = geohash d'une pos
 		
 		//Normalement un seul jo (un seul tour de boucle) mais sait-on jamais
@@ -268,20 +283,5 @@ public class Requests {
 			});
 		}
 		return individuals;
-	}
-	
-	public static void main(String[] args)
-	{
-		/*HashMap<String, Long> nbOccurences = fetchResultSpecieOccurences(getFromRequest(buildSpecieRequestWithGrid("Delphinidae", "3")));
-		for(Entry<String, Long> i : nbOccurences.entrySet())
-		{
-			System.out.println(i);
-		}*/
-		
-		/*for(String s : nbOccurences.keySet()) {
-			System.out.println(s);
-		}*/
-		//System.out.println(buildGeoHashRequest("spd", "Manta birostris"));
-
 	}
 }
