@@ -40,8 +40,13 @@ import model.geohash.Location;
  * @author Ruben Delamarche
  *
  */
+
 public class Requests {
 
+	 
+	 /**
+	 * Permet de lire un fichier et de le retourner au complet en String
+	 */
 	private static String readAll(Reader rd) throws IOException
 	{
 		StringBuilder sb = new StringBuilder();
@@ -52,6 +57,10 @@ public class Requests {
 		}
 		return sb.toString();
 	}
+
+	 /**
+	 * Recupere le JSONObject venant d'un fichier
+	 */
 
 	//On retourne une liste car la recherche verbose retourne directement un array
 	//solution : enlever l'array et retourner la liste d'objets a l'interieur
@@ -87,6 +96,10 @@ public class Requests {
 			return null;
 		}
 	}
+	
+	 /**
+	 * Recupere le JSONObject venant d'un url
+	 */
 
 	public static List<JSONObject> getFromRequest(String requestUrl)
 	{
@@ -130,12 +143,14 @@ public class Requests {
 		}
 	}
 
-	public static String buildGeoHashRequest(String geohash, String specieName)//String s = GeoHash plus tard
+	/**
+	* Cree la requete pour un geohash et un specieName(qui peut etre vide)
+	*/
+
+	public static String buildGeoHashRequest(String geohash, String specieName)
 	{
 		StringBuilder sb = new StringBuilder();
-		// pas besoin de /grid/3 ici, sinon on n'a pas les infos des signalements
 		sb.append("https://api.obis.org/v3/occurrence?");
-		// pas besoin de specieName? (on regarde les espèces en fonction de l'espèce déjà entrée ou juste en général?)
 		if(!specieName.equals(""))
 		{
 			specieName = specieName.replace(" ", "%20");
@@ -146,6 +161,9 @@ public class Requests {
 		return sb.toString();
 	}
 
+	/**
+	* Cree la requete pour un specieName uniquement
+	*/
 	public static String buildSpecieRequest(String specieName)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -155,6 +173,10 @@ public class Requests {
 		return sb.toString();
 	}
 
+	/**
+	* Cree la requete pour un specieName, on doit specifier ici le grid
+	*/
+	
 	public static String buildSpecieRequestWithGrid(String specieName, int grid)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -164,6 +186,9 @@ public class Requests {
 		return sb.toString();
 	}
 
+	/**
+	* Cree la requete pour un specieName, une date de debut et de fin et un grid
+	*/
 	public static String buildSpecieRequestWithGrid(String specieName, String startDate, String endDate, int grid)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -174,7 +199,10 @@ public class Requests {
 		sb.append("&enddate="+endDate);
 		return sb.toString();
 	}
-
+	
+	/**
+	* Cree la requete pour un debut de recherche d'une espece
+	*/
 	public static String buildRequestAutoIndent(String startName)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -183,6 +211,9 @@ public class Requests {
 		return sb.toString();
 	}
 
+	/**
+	* Retourne une liste des noms d'espece (scientificName)
+	*/
 	public static List<String> fetchAutoIndent(List<JSONObject> rawResult)
 	{
 		if(rawResult == null) {
@@ -196,7 +227,9 @@ public class Requests {
 		}
 		return listName;
 	}
-
+	/**
+	* Retourne une map qui lie un geohash et un nombre d'occurences
+	*/
 	public static HashMap<String, Long> fetchResultSpecieOccurences(List<JSONObject> rawResult)
 	{
 		if(rawResult == null) {
@@ -218,7 +251,7 @@ public class Requests {
 					JSONArray temp = coord.getJSONArray("coordinates");
 					temp.forEach(carre -> {
 						
-						Pair<BigDecimal, BigDecimal> a, c, milieu; //On veut calculer le centre du carrÃ© gÃ©o, qui vaut le milieu du segment AC
+						Pair<BigDecimal, BigDecimal> a, c, milieu; //On veut calculer le centre du carrÃƒÂ© gÃƒÂ©o, qui vaut le milieu du segment AC
 						JSONArray temp_coord = (JSONArray) carre;
 						a = new Pair<>(new BigDecimal(temp_coord.getJSONArray(0).get(1).toString()), new BigDecimal(temp_coord.getJSONArray(0).get(0).toString()));
 						c = new Pair<>(new BigDecimal(temp_coord.getJSONArray(2).get(1).toString()), new BigDecimal(temp_coord.getJSONArray(2).get(0).toString()));
@@ -237,7 +270,10 @@ public class Requests {
 		}
 		return nbOccurences;
 	}
-	
+	/**
+	* Retourne une liste de maps (qui lient geohash et un nombre d'occurences) par intervalle de temps de 5 ans
+	* entre une date de debut et une de fin
+	*/
 	public static List<Map<String, Long>> fetchTimeIntervals(String specieName, String _startDate, String _endDate)
 	{
 		List<Map<String, Long>> intervals = new ArrayList<Map<String, Long>>();
@@ -255,6 +291,10 @@ public class Requests {
 		return intervals;
 	}
 	
+	/**
+	* (plus rapide que fetchTimeIntervals) Retourne une liste de maps (qui lient geohash et un nombre d'occurences) par intervalle de temps de 5 ans
+	* entre une date de debut et une de fin, en utilisant des threads
+	*/
 	public static List<Map<String, Long>> fetchTimeIntervalsThread(String specieName, String _startDate, String _endDate)
 	{
 
@@ -289,7 +329,10 @@ public class Requests {
 
 		return intervals;
 	}
-	
+
+	/**
+	* Retourne une liste de signalements (lier a la fonction buildGeoHashRequest)
+	*/
 	public static List<Report> fetchResultGeoHash(List<JSONObject> rawResult)
 	{
 		if(rawResult == null) {
@@ -320,6 +363,7 @@ public class Requests {
 		return individuals;
 	}
 	
+	//main de test
 	public static void main(String[] args)
 	{
 		long start = System.currentTimeMillis();
