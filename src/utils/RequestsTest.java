@@ -1,4 +1,4 @@
-//package utils;
+package utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,12 +7,12 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URI;
-/*import java.net.http.HttpClient;
+import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;*/
+import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -90,7 +90,7 @@ public class Requests {
 
 	public static List<JSONObject> getFromRequest(String requestUrl)
 	{
-		/*String jsonText ="";
+		String jsonText ="";
 		HttpClient client = HttpClient.newBuilder()
 				.version(Version.HTTP_1_1)
 				.followRedirects(Redirect.NORMAL)
@@ -127,8 +127,7 @@ public class Requests {
 				listJson.add(objet);
 			});
 			return listJson;
-		}*/
-		return null;
+		}
 	}
 
 	public static String buildGeoHashRequest(String geohash, String specieName)//String s = GeoHash plus tard
@@ -330,7 +329,6 @@ class requestIntervalsThread implements Runnable
 		start = _start;
 		end = _end;
 		specieName = _specieName;
-
 	}
 
 	@Override
