@@ -26,10 +26,12 @@ import javafx.scene.input.PickResult;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
+import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.Sphere;
 import javafx.scene.shape.TriangleMesh;
+import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Translate;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -240,23 +242,37 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
      * Ajoute un item d'histogramme 3D dans le groupe parent entre en parametres.
      * 
      * @param parent : le groupe parent auquel est ajoute le quadrilatere
-     * @param width : la largeur de la Box
-     * @param height : la longueur de la Box
+     * @param middle : le point milieu
      * @param occ : le nombre d'occurrence (pour faire varier la profondeur)
      * @param material : le materiau a utiliser sur le quadrilatere
-     * @param lat : la lattitude associee
-     * @param lon : la longitude associee
      */
-    private void addHistogramItem(Group parent, double width, double height, double occ, PhongMaterial material, double lat, double lon) {
-    	final Box histoItem = new Box(width, height, occ*0.00001);
+    private void addHistogramItem(Group parent, Point3D middle, double occ, PhongMaterial material) {
+    	Point3D origin = new Point3D(0, 0, 0);
     	
-    	Point3D coord = geoCoordTo3dCoord(((Double)lat).floatValue(), ((Double)lon).floatValue());
-    	histoItem.setTranslateX(coord.getX());
-    	histoItem.setTranslateY(coord.getY());
-    	histoItem.setTranslateZ(coord.getZ());
+    	double x = middle.getX();
+    	double y = middle.getY();
+    	double z = middle.getZ();
     	
-    	histoItem.setMaterial(material);
-    	parent.getChildren().add(histoItem);
+    	double h = Math.sqrt(Math.sqrt(occ));
+    	x += x*h/10;
+    	y += y*h/10;
+    	z += z*h/10;
+    	Point3D m = new Point3D(x, y, z);
+    	
+    	Point3D yAxis = new Point3D(0,1,0);
+    	Point3D seg = m.subtract(origin);
+    	double height = seg.magnitude();
+    	Point3D midPoint = m.midpoint(origin);
+    	Translate moveToMidPoint = new Translate(midPoint.getX(), midPoint.getY(), midPoint.getZ());
+    	Point3D axisOfRotation = seg.crossProduct(yAxis);
+    	double angle = Math.acos(seg.normalize().dotProduct(yAxis));
+    	Rotate rotateAroundCenter = new Rotate(-Math.toDegrees(angle), axisOfRotation);
+    	
+    	Cylinder line = new Cylinder(0.01, height);
+    	line.getTransforms().addAll(moveToMidPoint, rotateAroundCenter);
+    	
+    	line.setMaterial(material);
+    	parent.getChildren().add(line);
     }
     
     /**
@@ -283,11 +299,16 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
 			occs.getChildren().clear();
 			
 			// Selon le nombre d'occurrences, on change la couleur du quadrilatere affiche
-			Double scale = (maxMinOcc.getKey().longValue() - maxMinOcc.getValue().longValue()) / 8.0;
+			Long[] scales = new Long[8];
+			for(int i = 0; i < 8; i++) {
+				scales[i] = Math.round(maxMinOcc.getKey() / (Math.pow(8-i, 4)));
+			}
 			for(String geoHash : occurrences.keySet()) {
 				int i = 1;
-				while(occurrences.get(geoHash).longValue() > Math.round(scale*i)) {
-					i++;
+				for(int j = 0; j < 8; j++) {
+					if(occurrences.get(geoHash).longValue() > scales[j]) {
+						i = j;
+					}
 				}
 				Color color;
 				switch(i) {
@@ -333,10 +354,12 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
 				Point3D bl = geoCoordTo3dCoord(la + SIZE_RECT, lo);
 				Point3D tl = geoCoordTo3dCoord(la + SIZE_RECT, lo + SIZE_RECT);
 				
+				Point3D m = geoCoordTo3dCoord(la, lo);
+				
 				if(!is3D) {
 					this.addQuadrilateral(occs, tr, br, bl, tl, material);
 				} else {
-					this.addHistogramItem(occs, 0.01, 0.01, occurrences.get(geoHash), material, la, lo);
+					this.addHistogramItem(occs, m, occurrences.get(geoHash), material);
 				}
 			}
 		}

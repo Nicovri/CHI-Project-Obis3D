@@ -40,10 +40,8 @@ import model.geohash.Location;
  * @author Ruben Delamarche
  *
  */
-
 public class Requests {
 
-	 
 	 /**
 	 * Permet de lire un fichier et de le retourner au complet en String
 	 */
@@ -61,7 +59,6 @@ public class Requests {
 	 /**
 	 * Recupere le JSONObject venant d'un fichier
 	 */
-
 	//On retourne une liste car la recherche verbose retourne directement un array
 	//solution : enlever l'array et retourner la liste d'objets a l'interieur
 	public static List<JSONObject> getFromFile(String path)
@@ -96,11 +93,10 @@ public class Requests {
 			return null;
 		}
 	}
-	
+
 	 /**
 	 * Recupere le JSONObject venant d'un url
 	 */
-
 	public static List<JSONObject> getFromRequest(String requestUrl)
 	{
 		String jsonText ="";
@@ -146,11 +142,12 @@ public class Requests {
 	/**
 	* Cree la requete pour un geohash et un specieName(qui peut etre vide)
 	*/
-
-	public static String buildGeoHashRequest(String geohash, String specieName)
+	public static String buildGeoHashRequest(String geohash, String specieName)//String s = GeoHash plus tard
 	{
 		StringBuilder sb = new StringBuilder();
+		// pas besoin de /grid/3 ici, sinon on n'a pas les infos des signalements
 		sb.append("https://api.obis.org/v3/occurrence?");
+		// pas besoin de specieName? (on regarde les espËces en fonction de l'espËce dÈj‡ entrÈe ou juste en gÈnÈral?)
 		if(!specieName.equals(""))
 		{
 			specieName = specieName.replace(" ", "%20");
@@ -176,7 +173,6 @@ public class Requests {
 	/**
 	* Cree la requete pour un specieName, on doit specifier ici le grid
 	*/
-	
 	public static String buildSpecieRequestWithGrid(String specieName, int grid)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -199,7 +195,7 @@ public class Requests {
 		sb.append("&enddate="+endDate);
 		return sb.toString();
 	}
-	
+
 	/**
 	* Cree la requete pour un debut de recherche d'une espece
 	*/
@@ -227,6 +223,7 @@ public class Requests {
 		}
 		return listName;
 	}
+
 	/**
 	* Retourne une map qui lie un geohash et un nombre d'occurences
 	*/
@@ -251,7 +248,7 @@ public class Requests {
 					JSONArray temp = coord.getJSONArray("coordinates");
 					temp.forEach(carre -> {
 						
-						Pair<BigDecimal, BigDecimal> a, c, milieu; //On veut calculer le centre du carr√É¬© g√É¬©o, qui vaut le milieu du segment AC
+						Pair<BigDecimal, BigDecimal> a, c, milieu; //On veut calculer le centre du carr√© g√©o, qui vaut le milieu du segment AC
 						JSONArray temp_coord = (JSONArray) carre;
 						a = new Pair<>(new BigDecimal(temp_coord.getJSONArray(0).get(1).toString()), new BigDecimal(temp_coord.getJSONArray(0).get(0).toString()));
 						c = new Pair<>(new BigDecimal(temp_coord.getJSONArray(2).get(1).toString()), new BigDecimal(temp_coord.getJSONArray(2).get(0).toString()));
@@ -270,6 +267,7 @@ public class Requests {
 		}
 		return nbOccurences;
 	}
+	
 	/**
 	* Retourne une liste de maps (qui lient geohash et un nombre d'occurences) par intervalle de temps de 5 ans
 	* entre une date de debut et une de fin
@@ -300,13 +298,21 @@ public class Requests {
 
 		LocalDate startDate = LocalDate.parse(_startDate);
 		LocalDate endDate = LocalDate.parse(_endDate);
-		int nbIntervals = (endDate.minusYears(startDate.getYear()).getYear() + 5 -1)/5;
-//		int nbIntervals = (endDate.minusYears(startDate.getYear()).getYear()/5)+1;
+//		int nbIntervals = (endDate.minusYears(startDate.getYear()).getYear()/5);
+		int nbIntervals = 1;
+		LocalDate startDateDouble = LocalDate.parse(_startDate);
+		while(startDateDouble.plusYears(5).isBefore(endDate)) {
+			nbIntervals++;
+			startDateDouble = startDateDouble.plusYears(5);
+		}
+//		if((endDate.getYear() - startDate.getYear()) % 5 == 0) {
+//			nbIntervals += 1;
+//		}
 		List<Map<String, Long>> intervals = new ArrayList<Map<String, Long>>();
 		for(int i = 0; i < nbIntervals; i++) {
 			intervals.add(null);
 		}
-		System.out.println(intervals.size());
+//		System.out.println(intervals.size());
 		int cpt = 0;
 		Thread listThread[] = new Thread[nbIntervals];
 		while(startDate.plusYears(5).isBefore(endDate))
@@ -329,7 +335,7 @@ public class Requests {
 
 		return intervals;
 	}
-
+	
 	/**
 	* Retourne une liste de signalements (lier a la fonction buildGeoHashRequest)
 	*/
@@ -350,7 +356,7 @@ public class Requests {
 				try
 				{
 					individuals.add(new Report(obj.getString("id"), "", //identifiedBy n'existe pas dans la requete apparemment
-							new Specie(obj.getString("scientificName"), obj.getString("order"), ""))); //superclass non plus
+							new Specie(obj.getString("scientificName"), obj.getString("order"), obj.getString("class")))); //superclass non plus
 				}
 				catch(Exception e)
 				{
@@ -363,15 +369,14 @@ public class Requests {
 		return individuals;
 	}
 	
-	//main de test
-	public static void main(String[] args)
-	{
-		long start = System.currentTimeMillis();
-		List<Map<String, Long>> list = fetchTimeIntervalsThread("Delphinidae", "1030-01-01", "2022-01-01");
-		for(Map<String, Long> m : list) {
-			System.out.println(m);
-		}
-		long end = System.currentTimeMillis();
-		System.out.println(end - start);
-	}
+//	public static void main(String[] args)
+//	{
+//		long start = System.currentTimeMillis();
+//		List<Map<String, Long>> list = fetchTimeIntervalsThread("Delphinidae", "1030-01-01", "2022-01-01");
+//		for(Map<String, Long> m : list) {
+//			System.out.println(m);
+//		}
+//		long end = System.currentTimeMillis();
+//		System.out.println(end - start);
+//	}
 }

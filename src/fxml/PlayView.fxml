@@ -12,7 +12,7 @@
 <VBox alignment="CENTER" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ProgressBar fx:id="timelineProgressBar" maxWidth="1.7976931348623157E308" progress="0.0" />
-      <HBox alignment="CENTER" spacing="100.0">
+      <HBox alignment="CENTER" spacing="200.0">
          <children>
             <Label fx:id="startDateLabel" text="startdate" />
             <Label fx:id="middleDateLabel" text="middledate" />

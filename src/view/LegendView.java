@@ -109,15 +109,18 @@ public class LegendView implements Initializable, ViewSpecieInterface, SpecieNam
 	public void updateSpecie(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc, boolean is3D) {
 		if(maxMinOcc.getKey() > 0) {
 			// Selon le nombre d'occurrences max et min, on change le nombre minimal et maximal pour chaque couleur
-			Double scale = (maxMinOcc.getKey().longValue() - maxMinOcc.getValue().longValue()) / 8.0;
-			label1.setText("From " + maxMinOcc.getValue().longValue() + " to " + Math.round(scale*1));
-			label2.setText("From " + Math.round(scale*1) + " to " + Math.round(scale*2));
-			label3.setText("From " + Math.round(scale*2) + " to " + Math.round(scale*3));
-			label4.setText("From " + Math.round(scale*3) + " to " + Math.round(scale*4));
-			label5.setText("From " + Math.round(scale*4) + " to " + Math.round(scale*5));
-			label6.setText("From " + Math.round(scale*5) + " to " + Math.round(scale*6));
-			label7.setText("From " + Math.round(scale*6) + " to " + Math.round(scale*7));
-			label8.setText("From " + Math.round(scale*7) + " to " + maxMinOcc.getKey());
+			Long[] scales = new Long[8];
+			for(int i = 0; i < 8; i++) {
+				scales[i] = Math.round(maxMinOcc.getKey() / (Math.pow(8-i, 4)));
+			}
+			label1.setText("From " + maxMinOcc.getValue().longValue() + " to " + Math.round(scales[0]));
+			label2.setText("From " + scales[0] + " to " + scales[1]);
+			label3.setText("From " + scales[1] + " to " + scales[2]);
+			label4.setText("From " + scales[2] + " to " + scales[3]);
+			label5.setText("From " + scales[3] + " to " + scales[4]);
+			label6.setText("From " + scales[4] + " to " + scales[5]);
+			label7.setText("From " + scales[5] + " to " + scales[6]);
+			label8.setText("From " + scales[6] + " to " + maxMinOcc.getKey());
 		}
 	}
 

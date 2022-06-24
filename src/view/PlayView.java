@@ -14,6 +14,7 @@ import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -69,6 +70,15 @@ public class PlayView implements Initializable, ViewSpecieInterface, SpecieNameL
 	
 	@FXML
 	private ProgressBar timelineProgressBar;
+	
+	@FXML
+	private Label startDateLabel;
+	
+	@FXML
+	private Label middleDateLabel;
+	
+	@FXML
+	private Label endDateLabel;
 	
 	public PlayView(Controller controller) {
 		this.controller = controller;
@@ -128,6 +138,12 @@ public class PlayView implements Initializable, ViewSpecieInterface, SpecieNameL
 			enddate = this.controller.getEndDate();
 			timelineProgressBar.setProgress(0);
 			
+			this.startDateLabel.setText(startdate);
+			int middleYear = (Integer.parseInt(enddate.substring(0, 4)) - Integer.parseInt(startdate.substring(0, 4)))/2;
+			middleYear += Integer.parseInt(startdate.substring(0, 4));
+			this.middleDateLabel.setText(middleYear + startdate.substring(4));
+			this.endDateLabel.setText(enddate);
+			
 			// On cree une timeline d'intervales de 5 ans
 			int startYear = Integer.parseInt(startdate.substring(0, 4));
 			String restStart = startdate.substring(4); 
@@ -165,8 +181,6 @@ public class PlayView implements Initializable, ViewSpecieInterface, SpecieNameL
 				timer.play();
 				scaleProg += scaleProg / 10000;
 				timelineProgressBar.setProgress(timelineProgressBar.getProgress() + scaleProg);
-				System.out.println(timelineProgressBar.getProgress());
-				System.out.println(timeline.size());
 			}));
 			timer.setCycleCount(Timeline.INDEFINITE);
 			timer.stop();
