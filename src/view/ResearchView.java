@@ -81,7 +81,7 @@ public class ResearchView implements Initializable, ViewSpecieInterface, SpecieN
 		endDate.setValue(LocalDate.now());
 		suggestions.setVisible(false);
 		
-		// Si on modifie les dates, on en informe le modèle grâce au controlleur
+		// Si on modifie les dates, on en informe le modele grace au controlleur
 		startDate.setOnAction(event -> {
 			controller.notifySpecieNameAndDateChanged(searchBar.getText(), startDate.getValue().toString(), endDate.getValue().toString());
 		});
@@ -89,8 +89,8 @@ public class ResearchView implements Initializable, ViewSpecieInterface, SpecieN
 			controller.notifySpecieNameAndDateChanged(searchBar.getText(), startDate.getValue().toString(), endDate.getValue().toString());
 		});
 		
-		// Chaque bouton informe le modèle du mode de rendu visuel (3D ou 2D) lorsqu'il est cliqué
-		// Le texte devient écrit en gras
+		// Chaque bouton informe le modele du mode de rendu visuel (3D ou 2D) lorsqu'il est clique
+		// Le texte devient ecrit en gras
 		fontRegular = mode2DButton.getFont();
 		fontBold = Font.font(fontRegular.getName(), FontWeight.BOLD, FontPosture.REGULAR, fontRegular.getSize());
 		mode2DButton.setFont(fontBold);
@@ -98,12 +98,12 @@ public class ResearchView implements Initializable, ViewSpecieInterface, SpecieN
 		mode2DButton.setOnMouseClicked(event -> {
 			mode2DButton.setFont(fontBold);
 			mode3DButton.setFont(fontRegular);
-			controller.notifySpecieNameChanged(searchBar.getText(), false);
+			controller.notifySpecieNameChanged(false);
 		});
 		mode3DButton.setOnMouseClicked(event -> {
 			mode2DButton.setFont(fontRegular);
 			mode3DButton.setFont(fontBold);
-			controller.notifySpecieNameChanged(searchBar.getText(), true);
+			controller.notifySpecieNameChanged(true);
 		});
 		
 		// Si la barre de recherche ou la liste des suggestions est en focus
@@ -117,17 +117,18 @@ public class ResearchView implements Initializable, ViewSpecieInterface, SpecieN
 		});
 		
 		// Lorsque le texte de la barre de recherche change, on affiche les suggestions dans la ListView
-		// N'effectue la requête qu'au dessus de 2 caractères (pour moins de requêtes)
+		// N'effectue la requete qu'au dessus de 2 caracteres (pour moins de requetes)
 		searchBar.textProperty().addListener(event -> {
 			suggestions.getItems().clear();
+			// erreur String null si pas Internet
 			if(searchBar.getText().length() > 2) {
 				suggestions.getItems().addAll(controller.getListSuggestions(searchBar.getText()));
 			}
 		});
 		
-		// Si on appuie sur entrée, qu'on clique sur le bouton de recherche,
-		// ou qu'on sélectionne un élément dans la liste des suggestions,
-		// on effectue la recherche pour cette espèce 
+		// Si on appuie sur entree, qu'on clique sur le bouton de recherche,
+		// ou qu'on selectionne un element dans la liste des suggestions,
+		// on effectue la recherche pour cette espece 
 		searchBar.setOnKeyPressed(event -> {
 			if(event.getCode() == KeyCode.ENTER) {
 				controller.notifySpecieNameChanged(searchBar.getText());
@@ -153,9 +154,9 @@ public class ResearchView implements Initializable, ViewSpecieInterface, SpecieN
 
 	@Override
 	public void updateSpecie(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc, boolean is3D) {
-		// Si la requête est nulle, on affiche une fenêtre d'erreur, le nom d'espèce n'existe pas
-		// (pas trouvé mieux comme solution, sinon, on dépend du fait que le nombre d'occurrences est positif)
-		// (alors que s'il est nul, on doit juste ne rien afficher, pour ne pas voir apparaitre la fenêtre d'erreur lors du mode lecture)
+		// Si la requete est nulle, on affiche une fenetre d'erreur, le nom d'espece n'existe pas
+		// (pas trouve mieux comme solution, sinon, on depend du fait que le nombre d'occurrences est positif)
+		// (alors que s'il est nul, on doit juste ne rien afficher, pour ne pas voir apparaitre la fenetre d'erreur lors du mode lecture)
 		if(Requests.getFromRequest(Requests.buildSpecieRequestWithGrid(specieName, this.startDate.getValue().toString(), this.endDate.getValue().toString(), 3)) != null) {
 			this.correctSpecieName = specieName;
 			this.searchBar.setText(correctSpecieName);

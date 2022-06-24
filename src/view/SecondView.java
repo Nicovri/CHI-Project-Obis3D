@@ -20,7 +20,7 @@ import model.animal.Report;
 import model.animal.Specie;
 
 /**
- * Vue secondaire responsable de l'affichage de la liste des espèces et des signalements.
+ * Vue secondaire responsable de l'affichage de la liste des especes et des signalements.
  * 
  * @version 1.0.0
  * 
@@ -53,8 +53,8 @@ public class SecondView implements Initializable, ViewGeoHashInterface, GeoHashL
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		
-		// Si on clique 2 fois sur le nom d'une espèce ou sur le bouton de sélection
-		// On effectue la recherche pour l'espèce selectionnée
+		// Si on clique 2 fois sur le nom d'une espece ou sur le bouton de selection
+		// On effectue la recherche pour l'espece selectionnee
 		this.listViewSpecies.setOnMouseClicked(event -> {
 			if(event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
 				controller.notifySpecieNameChanged(listViewSpecies.getSelectionModel().getSelectedItem());
@@ -69,11 +69,11 @@ public class SecondView implements Initializable, ViewGeoHashInterface, GeoHashL
 
 	@Override
 	public void updateGeoHash(String geoHash, ObservableList<Report> reports, ObservableList<Specie> species) {
-		// On ajoute le géohash pour lequel on a demandé les infos
+		// On ajoute le geohash pour lequel on a demande les infos
 		this.geoHashLabel1.setText("For the following GeoHash: " + geoHash);
 		this.geoHashLabel2.setText("For the following GeoHash: " + geoHash);
 		
-		// On ajoute la liste des espèces à ce géohash
+		// On ajoute la liste des especes a ce geohash
 		ObservableList<String> specieItems = FXCollections.observableArrayList();
 		for(Specie s : species) {
 			specieItems.add(s.getScientificName());
@@ -83,7 +83,7 @@ public class SecondView implements Initializable, ViewGeoHashInterface, GeoHashL
 		
 		this.listViewSpecies.getItems().addAll(specieItems);
 		
-		// On ajoute la liste des signalements et les infos supplémentaires dans l'accordéon
+		// On ajoute la liste des signalements et les infos supplementaires dans l'accordeon
 		ObservableList<TitledPane> reportItems = FXCollections.observableArrayList();
 		for(Report r : reports) {			
 			reportItems.add(

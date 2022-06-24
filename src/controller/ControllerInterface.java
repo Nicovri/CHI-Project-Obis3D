@@ -7,7 +7,7 @@ import event.GeoHashListener;
 import event.SpecieNameListener;
 
 /**
- * Interface contenant les fonctions utilisées dans le controlleur principal.
+ * Interface contenant les fonctions utilisees dans le controlleur principal.
  * 
  * @version 1.0.0
  * 
@@ -18,137 +18,126 @@ import event.SpecieNameListener;
 public interface ControllerInterface {
 	
 	/**
-	 * Permet d'obtenir la valeur actuelle du nom de l'espèce dans le modèle.
+	 * Permet d'obtenir la valeur actuelle du nom de l'espece dans le modele.
 	 * 
-	 * @return la valeur actuelle du nom de l'espèce
+	 * @return la valeur actuelle du nom de l'espece
 	 */
 	public String getSpecieName();
 	
 	/**
-	 * Permet d'obtenir la valeur actuelle de la date de début dans le modèle.
+	 * Permet d'obtenir la valeur actuelle de la date de debut dans le modele.
 	 * 
-	 * @return la valeur actuelle de la date de début
+	 * @return la valeur actuelle de la date de debut
 	 */
 	public String getStartDate();
 	
 	/**
-	 * Permet d'obtenir la valeur actuelle de la date de fin dans le modèle.
+	 * Permet d'obtenir la valeur actuelle de la date de fin dans le modele.
 	 * 
 	 * @return la valeur actuelle de la date de fin.
 	 */
 	public String getEndDate();
 	
 	/**
-	 * Permet de modifier la valeur du nom de l'espèce dans le modèle.
+	 * Permet de modifier la valeur du nom de l'espèce dans le modele.
 	 * 
-	 * @param specieName : le nouveau nom de l'espèce
+	 * @param specieName : le nouveau nom de l'espece
 	 */
 	public void setSpecieName(String specieName);
 	
 	/**
-	 * Permet d'obtenir la valeur actuelle du géohash dans le modèle.
+	 * Permet d'obtenir la valeur actuelle du geohash dans le modele.
 	 * 
-	 * @return la valeur actuelle du géohash
+	 * @return la valeur actuelle du geohash
 	 */
 	public String getGeoHash();
 	
 	/**
-	 * Permet de modifier la valeur du géohash dans le modèle.
+	 * Permet de modifier la valeur du geohash dans le modele.
 	 * 
-	 * @param geoHash : le nouveau géohash
+	 * @param geoHash : le nouveau geohash
 	 */
 	public void setGeoHash(String geoHash);
 	
 	/**
-	 * Ajoute un élément implémentant l'interface {@code SpecieNameListener} à la liste dans le modèle.
+	 * Ajoute un element implementant l'interface {@code SpecieNameListener} a la liste dans le modele.
 	 * 
-	 * @param specieNameListener : nouveau listener à ajouter
+	 * @param specieNameListener : nouveau listener a ajouter
 	 */
 	public void addSpecieNameListener(SpecieNameListener specieNameListener);
 	
 	/**
-	 * Supprime un élément implémentant l'interface {@code SpecieNameListener} à la liste dans le modèle.
+	 * Supprime un element implementant l'interface {@code SpecieNameListener} a la liste dans le modele.
 	 * 
-	 * @param specieNameListener : listener à supprimer
+	 * @param specieNameListener : listener a supprimer
 	 */
 	public void removeSpecieNameListener(SpecieNameListener specieNameListener);
 	
 	/**
-	 * Ajoute un élément implémentant l'interface {@code GeoHashListener} à la liste dans le modèle.
+	 * Ajoute un element implementant l'interface {@code GeoHashListener} a la liste dans le modele.
 	 * 
-	 * @param geoHashListener : nouveau listener à ajouter
+	 * @param geoHashListener : nouveau listener a ajouter
 	 */
 	public void addGeoHashListener(GeoHashListener geoHashListener);
 	
 	/**
-	 * Supprime un élément implémentant l'interface {@code GeoHashListener} à la liste dans le modèle.
+	 * Supprime un element implementant l'interface {@code GeoHashListener} a la liste dans le modele.
 	 * 
-	 * @param geoHashListener : listener à supprimer
+	 * @param geoHashListener : listener a supprimer
 	 */
 	public void removeGeoHashListener(GeoHashListener geoHashListener);
 	
 	/**
-	 * Permet d'obtenir les suggestions des 20 premiers noms d'espèce depuis le modèle.
+	 * Permet d'obtenir les suggestions des 20 premiers noms d'espece depuis le modele.
 	 * 
-	 * @param text : le début de nom d'espèce entré
+	 * @param text : le debut de nom d'espece entre
 	 * 
-	 * @return la liste des suggestions de 20 noms d'espèce.
+	 * @return la liste des suggestions de 20 noms d'espece.
 	 */
 	public List<String> getListSuggestions(String text);
 	
 	/**
-	 * Permet d'obtenir la liste des occurrences par intervalle de 5 ans depuis le modèle.
+	 * Permet d'obtenir la liste des occurrences par intervalle de 5 ans depuis le modele.
 	 * 
-	 * @return la liste des Map géohash -> nombre d'occurrences par intervalle de 5 ans
+	 * @return la liste des Map geohash -> nombre d'occurrences par intervalle de 5 ans
 	 */
 	public List<Map<String, Long>> getOccurrencesPerInterval();
 	
 	/**
-	 * Prévient le modèle que la valeur actuelle du nom d'espèce a changé.
+	 * Previent le modele que la valeur actuelle du nom d'espece a change.
 	 * 
-	 * @param specieName : le nom de l'espèce à changer
+	 * @param specieName : le nom de l'espece a changer
 	 */
 	public void notifySpecieNameChanged(String specieName);
 	
 	/**
-	 * Prévient le modèle que la valeur actuelle du nom d'espèce a changé, et spécifie à l'avance les occurrences.
+	 * Previent le modele que la valeur actuelle du nom d'espece a change, et specifie a l'avance les occurrences.
 	 * 
-	 * @param specieName : le nom de l'espèce à changer
-	 * @param occurrences : la Map géohash -> nombre d'occurrences à utiliser
+	 * @param specieName : le nom de l'espece a changer
+	 * @param occurrences : la Map geohash -> nombre d'occurrences a utiliser
 	 */
 	public void notifySpecieNameChanged(String specieName, Map<String, Long> occurrences);
 	
 	/**
-	 * Prévient le modèle que la valeur actuelle du nom d'espèce a changé.
+	 * Previent le modele que la valeur actuelle du rendu 3D ou 2D a change.
 	 * 
-	 * @param specieName : le nom de l'espèce à changer.
-	 * @param is3D : indique au modèle si le rendu sera 3D ou 2D (pour qu'il passe l'information aux autres listeners)
+	 * @param is3D : indique au modele si le rendu sera 3D ou 2D (pour qu'il passe l'information aux autres listeners)
 	 */
-	public void notifySpecieNameChanged(String specieName, boolean is3D);
+	public void notifySpecieNameChanged(boolean is3D);
 	
 	/**
-	 * Prévient le modèle que la valeur actuelle du nom d'espèce a changé, et spécifie les dates de début et de fin.
+	 * Previent le modele que la valeur actuelle du nom d'espece a change, et specifie les dates de debut et de fin.
 	 * 
-	 * @param specieName : le nom de l'espèce à changer.
-	 * @param startdate : la date de début de la recherche.
+	 * @param specieName : le nom de l'espece a changer.
+	 * @param startdate : la date de debut de la recherche.
 	 * @param enddate : la date de fin de la recherche.
 	 */
 	public void notifySpecieNameAndDateChanged(String specieName, String startdate, String enddate);
 	
 	/**
-	 * Prévient le modèle que la valeur actuelle du nom d'espèce a changé, et spécifie les dates de début et de fin.
+	 * Previent le modele que la valeur actuelle du geohash a change.
 	 * 
-	 * @param specieName : le nom de l'espèce à changer
-	 * @param startdate : la date de début de la recherche
-	 * @param enddate : la date de fin de la recherche
-	 * @param is3D : indique au modèle si le rendu sera 3D ou 2D (pour qu'il passe l'information aux autres listeners)
-	 */
-	public void notifySpecieNameAndDateChanged(String specieName, String startdate, String enddate, boolean is3D);
-	
-	/**
-	 * Prévient le modèle que la valeur actuelle du géohash a changé.
-	 * 
-	 * @param geoHash : la valeur du géohash à changer
+	 * @param geoHash : la valeur du geohash a changer
 	 */
 	public void notifyGeoHashChanged(String geoHash);
 }

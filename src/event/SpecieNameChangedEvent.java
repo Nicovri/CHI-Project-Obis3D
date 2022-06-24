@@ -8,7 +8,7 @@ import javafx.event.EventType;
 import javafx.util.Pair;
 
 /**
- * Evénement propagé lorsque la valeur du nom d'espèce est modifiée.
+ * Evenement propage lorsque la valeur du nom d'espece est modifiee.
  * 
  * @version 1.0.0
  * 
@@ -43,7 +43,6 @@ public class SpecieNameChangedEvent extends Event {
 		if(data.isEmpty()) {
 			return new Pair<Long, Long>(max, min);
 		}
-		// Iterables.get(collection, 0)
 		min = ((Long)data.values().toArray()[0]).longValue();
 		for(Long l : data.values()) {
 			if(l.longValue() > max) {

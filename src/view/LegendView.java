@@ -24,7 +24,7 @@ import javafx.util.Pair;
 import utils.ColorLegend8;
 
 /**
- * Vue responsable de l'affichage de la légende et du nombre minimal et maximal pour chaque couleur.
+ * Vue responsable de l'affichage de la legende et du nombre minimal et maximal pour chaque couleur.
  * 
  * @version 1.0.0
  * 

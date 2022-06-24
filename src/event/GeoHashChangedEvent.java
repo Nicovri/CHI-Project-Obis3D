@@ -10,7 +10,7 @@ import model.animal.Report;
 import model.animal.Specie;
 
 /**
- * Evénement propagé lorsque la valeur du géohash est modifiée.
+ * Evenement propage lorsque la valeur du geohash est modifiee.
  * 
  * @version 1.0.0
  * 

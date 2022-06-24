@@ -1,7 +1,7 @@
 package model.animal;
 
 /**
- * Classe représentant un signalement d'individu d'une espèce donnée.
+ * Classe representant un signalement d'individu d'une espece donnee.
  * 
  * @version 1.0.0
  * 

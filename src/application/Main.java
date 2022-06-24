@@ -9,7 +9,7 @@ import javafx.scene.Scene;
 
 /**
  * Classe principale de l'application.<br/>
- * Initialise la fenêtre principale et l'affiche.
+ * Initialise la fenetre principale et l'affiche.
  * 
  * @version 1.0.0
  * 

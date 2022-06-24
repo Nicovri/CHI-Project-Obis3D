@@ -1,8 +1,8 @@
 package event;
 
 /**
- * Listener réagissant à un changement de nom d'espèce.<br/>
- * Utilisé lorsqu'on a besoin de la valeur d'un nom d'espèce précis.
+ * Listener reagissant a un changement de nom d'espece.<br/>
+ * Utilise lorsqu'on a besoin de la valeur d'un nom d'espece precis.
  * 
  * @version 1.0.0
  * 
@@ -13,8 +13,8 @@ package event;
 public interface SpecieNameListener {
 
 	/**
-	 * Réagit à un changement de la valeur du nom de l'espèce dans le modèle.
-	 * @param event : l'événement correspondant à ce changement
+	 * Reagit a un changement de la valeur du nom de l'espece dans le modele.
+	 * @param event : l'evenement correspondant a ce changement
 	 */
 	public void specieNameChanged(SpecieNameChangedEvent event);
 }

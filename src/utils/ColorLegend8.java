@@ -3,7 +3,7 @@ package utils;
 import javafx.scene.paint.Color;
 
 /**
- * Enumération utilisée pour spécifier les couleurs de la légende et des zones ajoutées sur la Terre.
+ * Enumeration utilisee pour specifier les couleurs de la legende et des zones ajoutees sur la Terre.
  * 
  * @version 1.0.0
  * 

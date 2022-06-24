@@ -32,7 +32,7 @@ import model.geohash.GeoHashHelper;
 import model.geohash.Location;
 
 /**
- * Classe de fonctions statiques qui s'occupe de construire et d'exploiter les requêtes nécessaires à l'application.
+ * Classe de fonctions statiques qui s'occupe de construire et d'exploiter les requetes necessaires a l'application.
  * 
  * @version 1.0.0
  * 
@@ -255,6 +255,41 @@ public class Requests {
 		return intervals;
 	}
 	
+	public static List<Map<String, Long>> fetchTimeIntervalsThread(String specieName, String _startDate, String _endDate)
+	{
+
+		LocalDate startDate = LocalDate.parse(_startDate);
+		LocalDate endDate = LocalDate.parse(_endDate);
+		int nbIntervals = (endDate.minusYears(startDate.getYear()).getYear() + 5 -1)/5;
+//		int nbIntervals = (endDate.minusYears(startDate.getYear()).getYear()/5)+1;
+		List<Map<String, Long>> intervals = new ArrayList<Map<String, Long>>();
+		for(int i = 0; i < nbIntervals; i++) {
+			intervals.add(null);
+		}
+		System.out.println(intervals.size());
+		int cpt = 0;
+		Thread listThread[] = new Thread[nbIntervals];
+		while(startDate.plusYears(5).isBefore(endDate))
+		{
+			listThread[cpt] = new Thread(new RequestIntervalsThread(intervals, cpt, startDate.toString(), startDate.plusYears(5).toString(), specieName));
+			listThread[cpt].start();
+			startDate = startDate.plusYears(5);
+			cpt++;
+		}
+		listThread[cpt] = new Thread(new RequestIntervalsThread(intervals, cpt, startDate.toString(), endDate.toString(), specieName));
+		listThread[cpt].start();
+		for(Thread t : listThread)
+		{
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return intervals;
+	}
+	
 	public static List<Report> fetchResultGeoHash(List<JSONObject> rawResult)
 	{
 		if(rawResult == null) {
@@ -283,5 +318,16 @@ public class Requests {
 			});
 		}
 		return individuals;
+	}
+	
+	public static void main(String[] args)
+	{
+		long start = System.currentTimeMillis();
+		List<Map<String, Long>> list = fetchTimeIntervalsThread("Delphinidae", "1030-01-01", "2022-01-01");
+		for(Map<String, Long> m : list) {
+			System.out.println(m);
+		}
+		long end = System.currentTimeMillis();
+		System.out.println(end - start);
 	}
 }

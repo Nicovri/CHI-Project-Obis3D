@@ -13,7 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 /**
- * Vue responsable de coordonner les vues de la fenêtre principale.
+ * Vue responsable de coordonner les vues de la fenetre principale.
  * 
  * @version 1.0.0
  * 

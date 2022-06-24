@@ -5,7 +5,7 @@ import model.animal.Report;
 import model.animal.Specie;
 
 /**
- * Interface de mise à jour géohash de la vue concernée.
+ * Interface de mise a jour geohash de la vue concernee.
  * 
  * @version 1.0.0
  * 
@@ -15,11 +15,11 @@ import model.animal.Specie;
  */
 public interface ViewGeoHashInterface {
 	/**
-	 * Met à jour la vue en accord avec le modèle.
+	 * Met a jour la vue en accord avec le modele.
 	 * 
-	 * @param geoHash : la valeur du géohash à inclure dans la vue
-	 * @param reports : la liste des signalements à inclure dans la vue
-	 * @param species : la liste des espèces à inclure dans la vue
+	 * @param geoHash : la valeur du geohash a inclure dans la vue
+	 * @param reports : la liste des signalements a inclure dans la vue
+	 * @param species : la liste des especes a inclure dans la vue
 	 */
 	public void updateGeoHash(String geoHash, ObservableList<Report> reports, ObservableList<Specie> species);
 }

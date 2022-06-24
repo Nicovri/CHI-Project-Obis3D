@@ -39,7 +39,7 @@ import utils.CameraManager;
 import utils.ColorLegend8;
 
 /**
- * Vue responsable de l'affichage de la planète Terre et des éléments.
+ * Vue responsable de l'affichage de la planete Terre et des elements.
  * 
  * @version 1.0.0
  * 
@@ -75,24 +75,25 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
 	}
 	
 	/**
-	 * Initialisation du modèle 3D de la Terre
-	 * et du gestionnaire d'événements directement associé
-	 * (gestion du clic à la surface de la Terre)
+	 * Initialisation du modele 3D de la Terre
+	 * et du gestionnaire d'evenements directement associe
+	 * (gestion du clic a la surface de la Terre)
 	 */
 	private void initializeEarthModel() {
-		// Création et affichage du modèle 3D
+		// Creation et affichage du modele 3D
         ObjModelImporter objImporter = new ObjModelImporter();
+        // URL a remplacer selon comment on importe le code (/earth.obj)
         URL modelUrl = this.getClass().getResource("/res/earth.obj");
         objImporter.read(modelUrl);
         MeshView[] meshViews = objImporter.getImport();
         Group earth = new Group(meshViews);
         root3D.getChildren().add(earth);
 
-        // Mise en place de la caméra et de son gestionnaire
+        // Mise en place de la camera et de son gestionnaire
         Camera camera = new PerspectiveCamera(true);
         new CameraManager(camera, this, root3D);
 
-        // Ajout de lumière directionnelle
+        // Ajout de lumiere directionnelle
         PointLight light = new PointLight(Color.WHITE);
         light.setTranslateX(-180);
         light.setTranslateY(-90);
@@ -100,27 +101,27 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
         light.getScope().addAll(root3D);
         root3D.getChildren().add(light);
 
-        // Ajout de lumière ambiente
+        // Ajout de lumiere ambiente
         AmbientLight ambientLight = new AmbientLight(Color.WHITE);
         ambientLight.getScope().addAll(root3D);
         root3D.getChildren().add(ambientLight);
         
-        // Ajout de la subscene associée à la Terre
+        // Ajout de la subscene associee a la Terre
         SubScene subscene = new SubScene(root3D, 600, 600, true, SceneAntialiasing.BALANCED);
         subscene.setCamera(camera);
         subscene.setFill(Color.GREY);
 		this.getChildren().add(subscene);
 		
-		// Rendre les cubes visibles en les éloignant légèrement de la surface de la Terre
+		// Rendre les cubes visibles en les eloignant legerement de la surface de la Terre
 		occs.setScaleX(1.001);
 		occs.setScaleY(1.001);
 		occs.setScaleZ(1.001);
 		root3D.getChildren().add(occs);
 		
-		// Lorsqu'on clique sur la Terre avec la touche CTRL appuyée
+		// Lorsqu'on clique sur la Terre avec la touche CTRL appuyee
         subscene.addEventHandler(MouseEvent.ANY, event -> {
         	if(event.getEventType() == MouseEvent.MOUSE_PRESSED && event.isControlDown()) {
-        		// On récupère les coordonnées du clic
+        		// On recupere les coordonnees du clic
         		PickResult pickResult = event.getPickResult();
         		Point3D spaceCoord = pickResult.getIntersectedPoint();
         		
@@ -128,12 +129,12 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
         		Point2D cursor = spaceCoordToGeoCoord(spaceCoord);
         		Location loc = new Location("selectedGeoHash", cursor.getX(), cursor.getY());
         		
-        		// Si le géohash est bien valide
+        		// Si le geohash est bien valide
         		if(!GeoHashHelper.getGeohash(loc, 3).equals("000")) {
         			pointer = new Group();
         			root3D.getChildren().add(pointer);
         			
-        			// On ajoute une sphère à cet endroit
+        			// On ajoute une sphere a cet endroit
         			Sphere sphere = new Sphere(0.01);
         			sphere.setTranslateX(spaceCoord.getX());
         			sphere.setTranslateY(spaceCoord.getY());
@@ -144,7 +145,7 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
         			sphere.setMaterial(cursorMaterial);
         			pointer.getChildren().add(sphere);
         			
-        			// On charge la vue secondaire et on l'affiche dans une fenêtre modale
+        			// On charge la vue secondaire et on l'affiche dans une fenetre modale
         			secondView = new SecondView(this.controller);
         			
         			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/SecondView.fxml"));
@@ -169,7 +170,7 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
         			stage.setScene(new Scene(root));        			
         			stage.showAndWait();
         			
-        			// Après la fermeture de la fenêtre, on enlève le point de l'endroit où on a cliqué
+        			// Apres la fermeture de la fenetre, on enleve la sphere de l'endroit ou on a clique
         			pointer.getChildren().clear();
         		}
         	}
@@ -177,11 +178,11 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
 	}
 	
 	/**
-	 * Convertit une latitude et longitude en coordonnées 3D.
+	 * Convertit une latitude et longitude en coordonnees 3D.
 	 * 
 	 * @param lat : lattitude
 	 * @param lon : longitude
-	 * @return les coordonnées 3D correspondantes
+	 * @return les coordonnees 3D correspondantes
 	 */
     private Point3D geoCoordTo3dCoord(float lat, float lon) {
         float lat_cor = lat + TEXTURE_LAT_OFFSET;
@@ -195,14 +196,14 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
     }
     
     /**
-     * Ajoute un quadrilatère dans le groupe parent entré en paramètres.
+     * Ajoute un quadrilatere dans le groupe parent entre en parametres.
      * 
-     * @param parent : le groupe parent auquel ajouté le quadrilatère
-     * @param topRight : le point supérieur droit
-     * @param bottomRight : le point inférieur droit
-     * @param bottomLeft : le point inférieur gauche
-     * @param topLeft : le point supérieur gauche
-     * @param material : le matériau à utiliser sur le quadrilatère
+     * @param parent : le groupe parent auquel est ajoute le quadrilatere
+     * @param topRight : le point superieur droit
+     * @param bottomRight : le point inferieur droit
+     * @param bottomLeft : le point inferieur gauche
+     * @param topLeft : le point superieur gauche
+     * @param material : le materiau a utiliser sur le quadrilatere
      */
     private void addQuadrilateral(Group parent, Point3D topRight, Point3D bottomRight, Point3D bottomLeft, Point3D topLeft, PhongMaterial material) {
     	final TriangleMesh triangleMesh = new TriangleMesh();
@@ -236,15 +237,15 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
     }
     
     /**
-     * Ajoute un item d'histogramme 3D dans le groupe parent entré en paramètres.
+     * Ajoute un item d'histogramme 3D dans le groupe parent entre en parametres.
      * 
-     * @param parent : le groupe parent auquel ajouté le quadrilatère
+     * @param parent : le groupe parent auquel est ajoute le quadrilatere
      * @param width : la largeur de la Box
      * @param height : la longueur de la Box
      * @param occ : le nombre d'occurrence (pour faire varier la profondeur)
-     * @param material : le matériau à utiliser sur le quadrilatère
-     * @param lat : la lattitude associée
-     * @param lon : la longitude associée
+     * @param material : le materiau a utiliser sur le quadrilatere
+     * @param lat : la lattitude associee
+     * @param lon : la longitude associee
      */
     private void addHistogramItem(Group parent, double width, double height, double occ, PhongMaterial material, double lat, double lon) {
     	final Box histoItem = new Box(width, height, occ*0.00001);
@@ -259,9 +260,9 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
     }
     
     /**
-     * Convertit des coordonnées 3D en une latitude et une longitude.
+     * Convertit des coordonnees 3D en une latitude et une longitude.
      * 
-     * @param p : les coordonnées 3D à convertir
+     * @param p : les coordonnees 3D a convertir
      * @return la paire lattitude/longitude correspondante
      */
     private Point2D spaceCoordToGeoCoord(Point3D p) {
@@ -281,7 +282,7 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
 		if(maxMinOcc.getKey() >= 0) {
 			occs.getChildren().clear();
 			
-			// Selon le nombre d'occurrences, on change la couleur du quadrilatère affiché
+			// Selon le nombre d'occurrences, on change la couleur du quadrilatere affiche
 			Double scale = (maxMinOcc.getKey().longValue() - maxMinOcc.getValue().longValue()) / 8.0;
 			for(String geoHash : occurrences.keySet()) {
 				int i = 1;
@@ -335,7 +336,7 @@ public class EarthView extends Pane implements ViewSpecieInterface, SpecieNameLi
 				if(!is3D) {
 					this.addQuadrilateral(occs, tr, br, bl, tl, material);
 				} else {
-					this.addHistogramItem(occs, 0.1, 0.1, occurrences.get(geoHash), material, la, lo);
+					this.addHistogramItem(occs, 0.01, 0.01, occurrences.get(geoHash), material, la, lo);
 				}
 			}
 		}

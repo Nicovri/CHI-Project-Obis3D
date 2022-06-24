@@ -1,8 +1,8 @@
 package event;
 
 /**
- * Listener réagissant à un changement de géohash.<br/>
- * Utilisé lorsqu'on a besoin de la valeur d'un géohash précis.
+ * Listener reagissant a un changement de geohash.<br/>
+ * Utilise lorsqu'on a besoin de la valeur d'un geohash precis.
  * 
  * @version 1.0.0
  * 
@@ -12,9 +12,9 @@ package event;
  */
 public interface GeoHashListener {
 	/**
-	 * Réagit à un changement de la valeur du GeoHash dans le modèle.
+	 * Reagit a un changement de la valeur du geohash dans le modele.
 	 * 
-	 * @param event : l'événement correspondant à ce changement
+	 * @param event : l'evenement correspondant a ce changement
 	 */
 	public void geoHashChanged(GeoHashChangedEvent event);
 }

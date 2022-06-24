@@ -1,7 +1,7 @@
 package model.animal;
 
 /**
- * Classe représentant une espèce.
+ * Classe representant une espece.
  * 
  * @version 1.0.0
  * 

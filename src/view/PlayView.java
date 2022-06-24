@@ -9,7 +9,8 @@ import java.util.ResourceBundle;
 import controller.Controller;
 import event.SpecieNameChangedEvent;
 import event.SpecieNameListener;
-import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -19,11 +20,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 /**
- * Vue responsable de l'affichage de l'interface de lecture, pause et arrêt
- * du défilement des occurrences sur la Terre par pas de 5 ans.
+ * Vue responsable de l'affichage de l'interface de lecture, pause et arret
+ * du defilement des occurrences sur la Terre par pas de 5 ans.
  * 
  * @version 1.0.0
  * 
@@ -38,13 +40,14 @@ public class PlayView implements Initializable, ViewSpecieInterface, SpecieNameL
 	private Controller controller;
 	
 	private List<Pair<String, String>> timeline;
+	private String currentSpecieName;
 	private String startdate;
 	private String enddate;
 	private double scaleProg;
 	
 	private List<Map<String, Long>> intervals;
 	
-	private AnimationTimer timer;
+	private Timeline timer;
 	
 	@FXML
 	private Button playButton;
@@ -70,6 +73,8 @@ public class PlayView implements Initializable, ViewSpecieInterface, SpecieNameL
 	public PlayView(Controller controller) {
 		this.controller = controller;
 		this.timeline = new ArrayList<>();
+		this.intervals = new ArrayList<>();
+		this.currentSpecieName = " ";
 	}
 
 	@Override
@@ -84,66 +89,46 @@ public class PlayView implements Initializable, ViewSpecieInterface, SpecieNameL
 		fontBold = Font.font(fontRegular.getName(), FontWeight.BOLD, FontPosture.REGULAR, fontRegular.getSize());
 		stopButton.setFont(fontBold);
 		
-		// Cliquer sur le bouton play le transforme en bouton next (pour l'instant, tant que le timer n'est pas implémenté)
+		// Cliquer sur le bouton play le transforme en bouton next (pour l'instant, tant que le timer n'est pas implemente)
 		playButton.setOnMouseClicked(event -> {
 			playButton.setFont(fontBold);
-			playButton.setText("Next");
 			pauseButton.setFont(fontRegular);
 			stopButton.setFont(fontRegular);
 			
-			if(!timeline.isEmpty()) {
-				controller.notifySpecieNameChanged(controller.getSpecieName(), intervals.get(0));
-				timeline.remove(0);
-				intervals.remove(0);
-				System.out.println(scaleProg);
-				System.out.println(timelineProgressBar.getProgress());
-				timelineProgressBar.setProgress(timelineProgressBar.getProgress() + scaleProg);
-				System.out.println(timelineProgressBar.getProgress());
-//				timer.start();
-			} else {
-				System.out.println("empty");
-				
-//				timer.stop();
-				
-				timeline.clear();
-				intervals.clear();
-				controller.notifySpecieNameAndDateChanged(controller.getSpecieName(), startdate, enddate);
-			}
-			
+			timer.play();
 		});
-		// Cliquer sur le bouton pause arête le timer 
+		// Cliquer sur le bouton pause arete le timer 
 		pauseButton.setOnMouseClicked(event -> {
 			playButton.setFont(fontRegular);
-			playButton.setText("Play");
 			pauseButton.setFont(fontBold);
 			stopButton.setFont(fontRegular);
 			
-//			timer.stop();
+			timer.pause();
 		});
-		// Cliquer sur le bouton stop arête le timer, vide les données restantes et recharge les données initiales pour l'espèce et les dates
+		// Cliquer sur le bouton stop arete le timer, vide les donnees restantes et recharge les donnees initiales pour l'espece et les dates
 		stopButton.setOnMouseClicked(event -> {
 			playButton.setFont(fontRegular);
-			playButton.setText("Play");
 			pauseButton.setFont(fontRegular);
 			stopButton.setFont(fontBold);
 			
-//			timer.stop();
+			timer.stop();
 			
 			timeline.clear();
 			intervals.clear();
+			timelineProgressBar.setProgress(0);
 			controller.notifySpecieNameAndDateChanged(controller.getSpecieName(), startdate, enddate);
 		});
 	}
 
 	@Override
 	public void updateSpecie(String specieName, Map<String, Long> occurrences, Pair<Long, Long> maxMinOcc, boolean is3D) {
-		if(timeline.isEmpty()) {
+		if(!currentSpecieName.equals(specieName) || !startdate.equals(controller.getStartDate()) || !enddate.equals(controller.getEndDate()) || timeline.isEmpty()) {
+			currentSpecieName = specieName;
 			startdate = this.controller.getStartDate();
 			enddate = this.controller.getEndDate();
 			timelineProgressBar.setProgress(0);
-			playButton.setText("Play");
 			
-			// On crée une timeline d'intervalles de 5 ans
+			// On cree une timeline d'intervales de 5 ans
 			int startYear = Integer.parseInt(startdate.substring(0, 4));
 			String restStart = startdate.substring(4); 
 			int endYear = Integer.parseInt(enddate.substring(0, 4));
@@ -157,28 +142,34 @@ public class PlayView implements Initializable, ViewSpecieInterface, SpecieNameL
 			this.timeline.add(new Pair<>(Integer.toString(startYear) + restStart, enddate));
 			
 			this.scaleProg = 1.0 / timeline.size();
+			System.out.println(scaleProg);
+			System.out.println(timeline.size());
 			
-			// Et on récupère les données correspondantes
+			// Et on recupere les donnees correspondantes
 			this.intervals = new ArrayList<>();
 			this.intervals = controller.getOccurrencesPerInterval();
 			
-			// On initialise le timer selon les données reçues de timeline
-			this.timer = new AnimationTimer() {
-				@Override
-				public void handle(long currentNanoTime) {
-					if(timeline.isEmpty()) {
-						this.stop();
-					}
-					if(currentNanoTime % 1000000000 == 0) {
-						controller.notifySpecieNameChanged(controller.getSpecieName(), intervals.get(0));
-						timeline.remove(0);
-						intervals.remove(0);
-						timelineProgressBar.setProgress(timelineProgressBar.getProgress() + scaleProg);
-					}
-//					timelineProgressBar.setProgress(currentNanoTime / 1000000000);
-//					System.out.println(timelineProgressBar.getProgress());
+			// On initialise le timer selon les donnees reçues de timeline
+			this.timer = new Timeline(new KeyFrame(Duration.millis(50), event -> {
+				if(timeline.isEmpty()) {
+					timer.stop();
+					timeline.clear();
+					intervals.clear();
+					timelineProgressBar.setProgress(0);
+					controller.notifySpecieNameAndDateChanged(controller.getSpecieName(), startdate, enddate);
 				}
-			};
+				timer.pause();
+				controller.notifySpecieNameChanged(controller.getSpecieName(), intervals.get(0));
+				timeline.remove(0);
+				intervals.remove(0);
+				timer.play();
+				scaleProg += scaleProg / 10000;
+				timelineProgressBar.setProgress(timelineProgressBar.getProgress() + scaleProg);
+				System.out.println(timelineProgressBar.getProgress());
+				System.out.println(timeline.size());
+			}));
+			timer.setCycleCount(Timeline.INDEFINITE);
+			timer.stop();
 		}
 		
 	}

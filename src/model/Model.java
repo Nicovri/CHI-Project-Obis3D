@@ -16,12 +16,14 @@ import model.animal.Report;
 import utils.Requests;
 
 /**
- * Modèle principal de l'application.
+ * Modele principal de l'application.
  * 
  * @version 1.0.0
  * 
  * @author Nicolas Vrignaud
  * @author Ruben Delamarche
+ * 
+ * @see model.ModelInterface
  *
  */
 public class Model implements ModelInterface {
@@ -101,6 +103,7 @@ public class Model implements ModelInterface {
 	@Override
 	public void setIs3D(boolean is3D) {
 		this.is3D = is3D;
+		this.fireSpecieNameChanged(occurrences);
 	}
 
 	@Override
@@ -146,7 +149,8 @@ public class Model implements ModelInterface {
 	
 	@Override
 	public List<Map<String, Long>> getOccurrencesPerInterval() {
-		return Requests.fetchTimeIntervals(currentSpecieName, startdate, enddate);
+//		return Requests.fetchTimeIntervals(currentSpecieName, startdate, enddate);
+		return Requests.fetchTimeIntervalsThread(currentSpecieName, startdate, enddate);
 	}
 	
 	@Override
